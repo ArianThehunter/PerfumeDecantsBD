@@ -1,0 +1,98 @@
+# =============================================================================
+# PerfumeDecantBD — Docker Compose
+# =============================================================================
+# Usage:
+#   docker compose up -d        # Start all services
+#   docker compose down          # Stop all services
+#   docker compose logs -f       # Follow logs
+
+services:
+  # ---------------------------------------------------------------------------
+  # PostgreSQL Database
+  # ---------------------------------------------------------------------------
+  db:
+    image: postgres:16-alpine
+    container_name: perfumedecantbd-db
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER:-perfume_admin}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-perfume_dev_2024}
+      POSTGRES_DB: ${POSTGRES_DB:-perfumedecantbd}
+    ports:
+      - "${POSTGRES_PORT:-5432}:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-perfume_admin} -d ${POSTGRES_DB:-perfumedecantbd}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 30s
+    networks:
+      - perfumedecantbd
+
+  # ---------------------------------------------------------------------------
+  # FastAPI Backend
+  # ---------------------------------------------------------------------------
+  backend:
+    build:
+      context: .
+      dockerfile: Dockerfile.backend
+    container_name: perfumedecantbd-backend
+    restart: unless-stopped
+    environment:
+      DATABASE_URL: postgresql+asyncpg://${POSTGRES_USER:-perfume_admin}:${POSTGRES_PASSWORD:-perfume_dev_2024}@db:5432/${POSTGRES_DB:-perfumedecantbd}
+      SECRET_KEY: ${SECRET_KEY:-dev-secret-key}
+      JWT_ALGORITHM: ${JWT_ALGORITHM:-HS256}
+      JWT_ACCESS_TOKEN_EXPIRE_MINUTES: ${JWT_ACCESS_TOKEN_EXPIRE_MINUTES:-30}
+      JWT_REFRESH_TOKEN_EXPIRE_DAYS: ${JWT_REFRESH_TOKEN_EXPIRE_DAYS:-7}
+      CORS_ORIGINS: ${CORS_ORIGINS:-http://localhost:5173}
+      ENVIRONMENT: ${ENVIRONMENT:-development}
+      DEBUG: ${DEBUG:-true}
+      LOG_LEVEL: ${LOG_LEVEL:-INFO}
+    ports:
+      - "${BACKEND_PORT:-8000}:8000"
+    volumes:
+      - ./backend/src:/app/src
+      - ./uploads:/app/uploads
+    depends_on:
+      db:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8000/api/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+    networks:
+      - perfumedecantbd
+
+  # ---------------------------------------------------------------------------
+  # SvelteKit Frontend
+  # ---------------------------------------------------------------------------
+  frontend:
+    build:
+      context: .
+      dockerfile: Dockerfile.frontend
+    container_name: perfumedecantbd-frontend
+    restart: unless-stopped
+    environment:
+      PUBLIC_API_URL: http://backend:8000/api
+      PUBLIC_SITE_NAME: ${PUBLIC_SITE_NAME:-PerfumeDecantBD}
+    ports:
+      - "5173:5173"
+    volumes:
+      - ./frontend/src:/app/src
+      - ./frontend/static:/app/static
+    depends_on:
+      - backend
+    networks:
+      - perfumedecantbd
+
+volumes:
+  postgres_data:
+    driver: local
+
+networks:
+  perfumedecantbd:
+    driver: bridge

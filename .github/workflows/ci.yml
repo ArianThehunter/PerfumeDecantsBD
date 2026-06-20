@@ -1,0 +1,136 @@
+# =============================================================================
+# PerfumeDecantBD — GitHub Actions CI
+# =============================================================================
+name: CI
+
+on:
+  push:
+    branches: [main, develop]
+  pull_request:
+    branches: [main]
+
+env:
+  PYTHON_VERSION: "3.12"
+  NODE_VERSION: "20"
+
+jobs:
+  # ---------------------------------------------------------------------------
+  # Backend CI
+  # ---------------------------------------------------------------------------
+  backend:
+    name: Backend (Python)
+    runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgres:16-alpine
+        env:
+          POSTGRES_USER: test_user
+          POSTGRES_PASSWORD: test_password
+          POSTGRES_DB: test_perfumedecantbd
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install uv
+        uses: astral-sh/setup-uv@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: ${{ env.PYTHON_VERSION }}
+
+      - name: Install dependencies
+        working-directory: backend
+        run: uv sync
+
+      - name: Lint with ruff
+        working-directory: backend
+        run: |
+          uv run ruff check src/
+          uv run ruff format --check src/
+
+      - name: Type check with mypy
+        working-directory: backend
+        run: uv run mypy src/ --ignore-missing-imports
+
+      - name: Run tests
+        working-directory: backend
+        env:
+          DATABASE_URL: postgresql+asyncpg://test_user:test_password@localhost:5432/test_perfumedecantbd
+          SECRET_KEY: test-secret-key
+          ENVIRONMENT: testing
+        run: uv run pytest -v --cov=src --cov-report=xml
+
+      - name: Upload coverage
+        uses: codecov/codecov-action@v4
+        with:
+          file: backend/coverage.xml
+          flags: backend
+        continue-on-error: true
+
+  # ---------------------------------------------------------------------------
+  # Frontend CI
+  # ---------------------------------------------------------------------------
+  frontend:
+    name: Frontend (SvelteKit)
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: latest
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: pnpm
+          cache-dependency-path: frontend/pnpm-lock.yaml
+
+      - name: Install dependencies
+        working-directory: frontend
+        run: pnpm install --frozen-lockfile
+
+      - name: Lint
+        working-directory: frontend
+        run: pnpm run lint
+
+      - name: Type check
+        working-directory: frontend
+        run: pnpm run check
+
+      - name: Build
+        working-directory: frontend
+        run: pnpm run build
+
+      - name: Run tests
+        working-directory: frontend
+        run: pnpm run test:unit
+        continue-on-error: true
+
+  # ---------------------------------------------------------------------------
+  # Docker Build Test
+  # ---------------------------------------------------------------------------
+  docker:
+    name: Docker Build
+    runs-on: ubuntu-latest
+    needs: [backend, frontend]
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Build backend image
+        run: docker build -f Dockerfile.backend -t perfumedecantbd-backend .
+
+      - name: Build frontend image
+        run: docker build -f Dockerfile.frontend -t perfumedecantbd-frontend .
