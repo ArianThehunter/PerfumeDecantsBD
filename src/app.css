@@ -1,0 +1,275 @@
+@import 'tailwindcss';
+@plugin '@tailwindcss/typography';
+@plugin '@tailwindcss/forms';
+
+/* ============================================
+   PerfumeDecantsBD — Design System
+   Brand Colors: Deep Burgundy + Warm Gold + Cream
+   ============================================ */
+
+@theme {
+  /* Brand Colors */
+  --color-burgundy-50: #fdf2f4;
+  --color-burgundy-100: #fae6ea;
+  --color-burgundy-200: #f5c7d0;
+  --color-burgundy-300: #eda2b2;
+  --color-burgundy-400: #e07189;
+  --color-burgundy-500: #d14a68;
+  --color-burgundy-600: #b82e50;
+  --color-burgundy-700: #9b2241;
+  --color-burgundy-800: #7a1b3e;
+  --color-burgundy-900: #6b1a38;
+  --color-burgundy-950: #3d0a1c;
+
+  --color-gold-50: #fdf9ef;
+  --color-gold-100: #faf0d5;
+  --color-gold-200: #f4dfaa;
+  --color-gold-300: #ecc974;
+  --color-gold-400: #e4af45;
+  --color-gold-500: #d4a855;
+  --color-gold-600: #c4792a;
+  --color-gold-700: #a35a24;
+  --color-gold-800: #854823;
+  --color-gold-900: #6e3c20;
+  --color-gold-950: #3e1e0f;
+
+  --color-cream-50: #fefdf8;
+  --color-cream-100: #fcf9ed;
+  --color-cream-200: #f5e6c8;
+  --color-cream-300: #eed5a3;
+  --color-cream-400: #e4bf78;
+  --color-cream-500: #dba954;
+  --color-cream-600: #cd8f3a;
+  --color-cream-700: #ab7130;
+  --color-cream-800: #8a5a2d;
+  --color-cream-900: #714a28;
+  --color-cream-950: #3d2513;
+
+  /* Typography */
+  --font-heading: 'Playfair Display', serif;
+  --font-body: 'Inter', sans-serif;
+
+  /* Animations */
+  --animate-fade-in: fade-in 0.6s ease-out forwards;
+  --animate-slide-up: slide-up 0.6s ease-out forwards;
+  --animate-slide-down: slide-down 0.4s ease-out forwards;
+  --animate-scale-in: scale-in 0.3s ease-out forwards;
+  --animate-shimmer: shimmer 2s infinite linear;
+  --animate-float: float 6s ease-in-out infinite;
+  --animate-pulse-soft: pulse-soft 3s ease-in-out infinite;
+}
+
+/* Keyframes */
+@keyframes fade-in {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes slide-up {
+  from { opacity: 0; transform: translateY(20px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes slide-down {
+  from { opacity: 0; transform: translateY(-10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes scale-in {
+  from { opacity: 0; transform: scale(0.95); }
+  to { opacity: 1; transform: scale(1); }
+}
+
+@keyframes shimmer {
+  0% { background-position: -200% 0; }
+  100% { background-position: 200% 0; }
+}
+
+@keyframes float {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-10px); }
+}
+
+@keyframes pulse-soft {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.7; }
+}
+
+/* ============================================
+   Base Styles
+   ============================================ */
+
+html {
+  font-family: var(--font-body);
+  scroll-behavior: smooth;
+}
+
+body {
+  @apply bg-white text-gray-900 transition-colors duration-300;
+}
+
+:root {
+  --bg-primary: #fcfaf6;
+  --bg-secondary: #f6f3ec;
+  --bg-tertiary: #eeeae0;
+  --text-primary: #2c1b18;
+  --text-secondary: #574b46;
+  --text-muted: #8e807a;
+  --border-color: #e6dfd5;
+  --card-bg: #ffffff;
+  --card-shadow: 0 1px 3px rgba(44, 27, 24, 0.04), 0 1px 2px rgba(44, 27, 24, 0.02);
+  --card-shadow-hover: 0 10px 40px rgba(44, 27, 24, 0.06);
+  --glass-bg: rgba(252, 250, 246, 0.85);
+  --glass-border: rgba(230, 223, 213, 0.4);
+  --navbar-bg: rgba(252, 250, 246, 0.96);
+  --overlay-bg: rgba(44, 27, 24, 0.4);
+}
+
+.dark {
+  --bg-primary: #0f0f0f;
+  --bg-secondary: #1a1a1a;
+  --bg-tertiary: #242424;
+  --text-primary: #f5f3f0;
+  --text-secondary: #b0aca6;
+  --text-muted: #6a6660;
+  --border-color: #2a2a2a;
+  --card-bg: #1a1a1a;
+  --card-shadow: 0 1px 3px rgba(0, 0, 0, 0.3), 0 1px 2px rgba(0, 0, 0, 0.2);
+  --card-shadow-hover: 0 10px 40px rgba(0, 0, 0, 0.4);
+  --glass-bg: rgba(15, 15, 15, 0.8);
+  --glass-border: rgba(255, 255, 255, 0.08);
+  --navbar-bg: rgba(15, 15, 15, 0.95);
+  --overlay-bg: rgba(0, 0, 0, 0.7);
+}
+
+.dark body {
+  @apply bg-[#0f0f0f] text-gray-100;
+}
+
+/* ============================================
+   Custom Utilities
+   ============================================ */
+
+/* Heading typography */
+.font-heading {
+  font-family: var(--font-heading);
+}
+
+/* Glass morphism */
+.glass {
+  background: var(--glass-bg);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: 1px solid var(--glass-border);
+}
+
+/* Premium card style */
+.card-premium {
+  background: var(--card-bg);
+  box-shadow: var(--card-shadow);
+  border: 1px solid var(--border-color);
+  border-radius: 1rem;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.card-premium:hover {
+  box-shadow: var(--card-shadow-hover);
+  transform: translateY(-2px);
+}
+
+/* Gradient text */
+.text-gradient {
+  background: linear-gradient(135deg, var(--color-burgundy-700), var(--color-gold-500));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+/* Gold accent underline */
+.underline-gold {
+  position: relative;
+  display: inline-block;
+}
+
+.underline-gold::after {
+  content: '';
+  position: absolute;
+  bottom: -4px;
+  left: 0;
+  width: 100%;
+  height: 2px;
+  background: linear-gradient(90deg, var(--color-gold-400), var(--color-gold-600));
+  border-radius: 1px;
+}
+
+/* Button press effect */
+.btn-press {
+  transition: transform 0.15s ease;
+}
+
+.btn-press:active {
+  transform: scale(0.97);
+}
+
+/* Scrollbar styling */
+::-webkit-scrollbar {
+  width: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: var(--bg-secondary);
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--color-burgundy-300);
+  border-radius: 4px;
+}
+
+.dark ::-webkit-scrollbar-thumb {
+  background: var(--color-burgundy-800);
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--color-burgundy-500);
+}
+
+/* Focus ring */
+*:focus-visible {
+  outline: 2px solid var(--color-burgundy-500);
+  outline-offset: 2px;
+  border-radius: 4px;
+}
+
+/* Selection color */
+::selection {
+  background: var(--color-burgundy-200);
+  color: var(--color-burgundy-900);
+}
+
+.dark ::selection {
+  background: var(--color-burgundy-800);
+  color: var(--color-cream-100);
+}
+
+/* Container */
+.container-luxury {
+  @apply mx-auto w-full max-w-7xl px-4 sm:px-6 lg:px-8;
+}
+
+/* Section spacing */
+.section-padding {
+  @apply py-16 sm:py-20 lg:py-24;
+}
+
+/* Skeleton shimmer */
+.skeleton {
+  background: linear-gradient(
+    90deg,
+    var(--bg-tertiary) 25%,
+    var(--bg-secondary) 50%,
+    var(--bg-tertiary) 75%
+  );
+  background-size: 400% 100%;
+  animation: shimmer 2s infinite linear;
+  border-radius: 0.5rem;
+}
