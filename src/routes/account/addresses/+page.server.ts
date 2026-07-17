@@ -33,6 +33,7 @@ export const actions: Actions = {
     const addressLine1 = formData.get('addressLine1') as string;
     const addressLine2 = formData.get('addressLine2') as string;
     const city = formData.get('city') as string;
+    const district = formData.get('district') as string;
     const postalCode = formData.get('postalCode') as string;
     const isDefault = formData.get('isDefault') === 'on';
 
@@ -55,6 +56,7 @@ export const actions: Actions = {
         address_line_1: addressLine1,
         address_line_2: addressLine2 || null,
         city,
+        district,
         postal_code: postalCode,
         is_default: isDefault
       });

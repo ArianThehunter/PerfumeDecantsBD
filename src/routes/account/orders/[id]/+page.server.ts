@@ -1,8 +1,8 @@
-import { error } from '@sveltejs/kit';
-import type { PageServerLoad } from './$types';
+import { error, fail } from '@sveltejs/kit';
+import type { PageServerLoad, Actions } from './$types';
 
 export const load: PageServerLoad = async ({ params, locals }) => {
-  const supabase = locals.supabase;
+  const supabase = locals.supabase as any;
   const user = locals.user;
 
   if (!user) {
@@ -42,4 +42,49 @@ export const load: PageServerLoad = async ({ params, locals }) => {
     order,
     items: items || []
   };
+};
+
+export const actions: Actions = {
+  cancelOrder: async ({ params, locals }) => {
+    const supabase = locals.supabase as any;
+    const user = locals.user;
+
+    if (!user) {
+      return fail(401, { message: 'Unauthorized' });
+    }
+
+    // Load order to verify ownership and status
+    const { data: order, error: fetchErr } = await supabase
+      .from('orders')
+      .select('status, user_id')
+      .eq('id', params.id)
+      .single();
+
+    if (fetchErr || !order) {
+      return fail(404, { message: 'Order not found' });
+    }
+
+    if (order.user_id !== user.id) {
+      return fail(403, { message: 'You are not authorized to cancel this order.' });
+    }
+
+    if (order.status !== 'pending' && order.status !== 'confirmed') {
+      return fail(400, { message: 'This order is already being processed and cannot be cancelled.' });
+    }
+
+    // Cancel order in database
+    const { error: updateErr } = await supabase
+      .from('orders')
+      .update({
+        status: 'cancelled',
+        cancelled_at: new Date().toISOString()
+      })
+      .eq('id', params.id);
+
+    if (updateErr) {
+      return fail(500, { message: updateErr.message || 'Failed to cancel order.' });
+    }
+
+    return { success: true };
+  }
 };

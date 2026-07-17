@@ -63,6 +63,9 @@ export const actions: Actions = {
 
     // Resolve shipping address
     let shippingAddress = {};
+    let finalCity = '';
+    let finalDistrict = '';
+
     if (user && addressId && addressId !== 'new') {
       const { data: addr } = await supabase
         .from('addresses')
@@ -72,6 +75,8 @@ export const actions: Actions = {
         .single();
       
       if (addr) {
+        finalCity = addr.city;
+        finalDistrict = addr.district || '';
         shippingAddress = {
           full_name: addr.full_name,
           phone: addr.phone,
@@ -79,6 +84,7 @@ export const actions: Actions = {
           address_line_1: addr.address_line_1,
           address_line_2: addr.address_line_2,
           city: addr.city,
+          district: addr.district || '',
           postal_code: addr.postal_code
         };
       } else {
@@ -91,6 +97,7 @@ export const actions: Actions = {
       const addressLine1 = formData.get('addressLine1') as string;
       const addressLine2 = formData.get('addressLine2') as string;
       const city = formData.get('city') as string;
+      const district = formData.get('district') as string;
       const postalCode = formData.get('postalCode') as string;
       const guestEmail = formData.get('guestEmail') as string;
 
@@ -100,9 +107,19 @@ export const actions: Actions = {
         return fail(400, { message: 'Email address is required for checkout' });
       }
 
-      if (!fullName || !phone || !addressLine1 || !city || !postalCode) {
-        return fail(400, { message: 'All shipping address fields are required' });
+      // Mandatory validation checks
+      if (!fullName || !phone || !addressLine1 || !city || !district) {
+        return fail(400, { message: 'Full Name, Phone Number, Address Line 1, City, and District are mandatory fields.' });
       }
+
+      // Phone number format validation: exactly 11 digits, starts with 01, numbers only
+      const phoneRegex = /^01\d{9}$/;
+      if (!phoneRegex.test(phone)) {
+        return fail(400, { message: 'Phone number must start with 01 and contain exactly 11 digits.' });
+      }
+
+      finalCity = city;
+      finalDistrict = district;
 
       shippingAddress = {
         full_name: fullName,
@@ -111,6 +128,7 @@ export const actions: Actions = {
         address_line_1: addressLine1,
         address_line_2: addressLine2 || null,
         city: city,
+        district: district,
         postal_code: postalCode
       };
     }
@@ -120,7 +138,7 @@ export const actions: Actions = {
     for (const item of cartItems) {
       subtotal += item.unit_price * item.quantity;
     }
-    const shippingCost = subtotal >= 5000 ? 0 : 120;
+    const shippingCost = (finalDistrict === 'Dhaka' && finalCity.trim().toLowerCase() === 'dhaka') ? 80 : 140;
     const total = subtotal + shippingCost;
 
     // Validate and decrement stock
@@ -186,6 +204,6 @@ export const actions: Actions = {
       }
     }
 
-    return { success: true, orderId: order.id, orderNumber: order.order_number };
+    throw redirect(303, `/checkout/confirmation?id=${order.id}`);
   }
 };

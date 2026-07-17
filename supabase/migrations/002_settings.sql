@@ -29,7 +29,7 @@ insert into public.settings (key, value) values
   "telegram_url": "https://t.me/perfumedecantsbd",
   "address": "Dhaka, Bangladesh",
   "phone": "+880 1XXX-XXXXXX",
-  "email": "hello@perfumedecantsbd.com",
+  "email": "readusshalehin22@gmail.com",
   "copyright": "© 2026 PerfumeDecantsBD. All rights reserved."
 }'::jsonb),
 
@@ -51,7 +51,7 @@ insert into public.settings (key, value) values
   "form_subtitle": "We typically respond within 24 business hours.",
   "address": "Dhaka, Bangladesh",
   "phone": "+880 1XXX-XXXXXX",
-  "email": "hello@perfumedecantsbd.com",
+  "email": "readusshalehin22@gmail.com",
   "hours": "Sat - Thu: 10AM - 8PM",
   "map_lat": "23.8103",
   "map_lng": "90.4125"

@@ -215,6 +215,7 @@ export interface Database {
           address_line_1: string;
           address_line_2: string | null;
           city: string;
+          district: string | null;
           postal_code: string;
           is_default: boolean;
           created_at: string;
@@ -229,6 +230,7 @@ export interface Database {
           address_line_1: string;
           address_line_2?: string | null;
           city: string;
+          district?: string | null;
           postal_code: string;
           is_default?: boolean;
           created_at?: string;
@@ -241,6 +243,7 @@ export interface Database {
           address_line_1?: string;
           address_line_2?: string | null;
           city?: string;
+          district?: string | null;
           postal_code?: string;
           is_default?: boolean;
           updated_at?: string;
@@ -258,6 +261,7 @@ export interface Database {
           payment_method: PaymentMethod;
           shipping_address: Json;
           notes: string | null;
+          cancelled_at: string | null;
           created_at: string;
           updated_at: string;
         };
@@ -271,7 +275,8 @@ export interface Database {
           total: number;
           payment_method: PaymentMethod;
           shipping_address: Json;
-          notes?: string | null;
+          notes: string | null;
+          cancelled_at?: string | null;
           created_at?: string;
           updated_at?: string;
         };
@@ -279,6 +284,7 @@ export interface Database {
           status?: OrderStatus;
           shipping_cost?: number;
           notes?: string | null;
+          cancelled_at?: string | null;
           updated_at?: string;
         };
       };

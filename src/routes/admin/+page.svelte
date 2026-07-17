@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { ShoppingBag, TrendingUp, AlertTriangle, CheckCircle, Clock, FileSpreadsheet } from '@lucide/svelte';
+  import { ShoppingBag, TrendingUp, AlertTriangle, CheckCircle, Clock, FileSpreadsheet, ShieldAlert } from '@lucide/svelte';
   import { formatPrice, formatDate, getStatusColor } from '$lib/utils';
   import type { PageData } from './$types';
 
@@ -8,14 +8,13 @@
   let stats = $derived(data.stats);
   let recentOrders = $derived(data.recentOrders);
   let lowStockProducts = $derived(data.lowStockProducts);
+  let cancelledOrders = $derived(data.cancelledOrders || []);
+  let weeklySales = $derived(data.weeklySales || []);
 
-  // Simulated 30 day sales bar data
-  const simulatedSales = [
-    { day: 'W1', amount: 12000 },
-    { day: 'W2', amount: 18500 },
-    { day: 'W3', amount: 15000 },
-    { day: 'W4', amount: 24500 }
-  ];
+  // Compute maximum amount to scale chart bar heights proportionally
+  let maxAmount = $derived(
+    Math.max(...weeklySales.map((w: any) => w.amount), 1000)
+  );
 </script>
 
 <svelte:head>
@@ -28,17 +27,63 @@
     <p class="text-sm text-[var(--text-muted)]">Real-time status updates of your decant operations.</p>
   </div>
 
+  <!-- Cancelled Orders Alerts -->
+  {#if cancelledOrders.length > 0}
+    <div class="space-y-2.5">
+      {#each cancelledOrders as ord}
+        <div class="flex items-center justify-between rounded-xl bg-red-50 border border-red-200/50 p-4 dark:bg-red-950/15 dark:border-red-900/30 text-red-800 dark:text-red-300 animate-scale-in">
+          <div class="flex items-center gap-2.5 min-w-0">
+            <ShieldAlert class="h-5 w-5 text-red-650 dark:text-red-400 shrink-0" />
+            <span class="text-xs font-semibold truncate">
+              Order <strong class="font-bold font-mono">{ord.order_number}</strong> was cancelled by customer on {ord.cancelled_at ? new Date(ord.cancelled_at).toLocaleString() : 'N/A'}
+            </span>
+          </div>
+          <a
+            href="/admin/orders/{ord.id}"
+            class="text-xs font-bold underline hover:text-red-950 dark:hover:text-red-100 pl-3 shrink-0"
+          >
+            Manage Order
+          </a>
+        </div>
+      {/each}
+    </div>
+  {/if}
+
   <!-- Key Statistics Grid -->
   <div class="grid gap-6 sm:grid-cols-2 lg:grid-cols-5">
-    <!-- Stat 1: Revenue -->
+    <!-- Stat 1: Lifetime Revenue -->
     <div class="card-premium p-6 space-y-4">
       <div class="flex items-center justify-between">
-        <span class="text-xs font-bold uppercase tracking-wider text-[var(--text-muted)]">Revenue</span>
+        <span class="text-xs font-bold uppercase tracking-wider text-[var(--text-muted)]">Lifetime Revenue</span>
         <TrendingUp class="h-4.5 w-4.5 text-green-500" />
       </div>
       <div>
         <h3 class="font-heading text-2xl font-bold text-gray-900 dark:text-white">{formatPrice(stats.revenue)}</h3>
-        <p class="text-[10px] text-green-600 mt-1 font-semibold">Excluding cancelled orders</p>
+        <p class="text-[10px] text-green-600 mt-1 font-semibold">Completed orders only</p>
+      </div>
+    </div>
+
+    <!-- Stat 2: Monthly Revenue -->
+    <div class="card-premium p-6 space-y-4">
+      <div class="flex items-center justify-between">
+        <span class="text-xs font-bold uppercase tracking-wider text-[var(--text-muted)]">Monthly Revenue</span>
+        <TrendingUp class="h-4.5 w-4.5 text-green-500" />
+      </div>
+      <div>
+        <h3 class="font-heading text-2xl font-bold text-gray-900 dark:text-white">{formatPrice(stats.monthlyRevenue)}</h3>
+        <p class="text-[10px] text-green-600 mt-1 font-semibold">This month (completed)</p>
+      </div>
+    </div>
+
+    <!-- Stat 3: Daily Revenue -->
+    <div class="card-premium p-6 space-y-4">
+      <div class="flex items-center justify-between">
+        <span class="text-xs font-bold uppercase tracking-wider text-[var(--text-muted)]">Daily Revenue</span>
+        <TrendingUp class="h-4.5 w-4.5 text-green-500" />
+      </div>
+      <div>
+        <h3 class="font-heading text-2xl font-bold text-gray-900 dark:text-white">{formatPrice(stats.dailyRevenue)}</h3>
+        <p class="text-[10px] text-green-600 mt-1 font-semibold">Today (completed)</p>
       </div>
     </div>
 
@@ -54,18 +99,6 @@
       </div>
     </div>
 
-    <!-- Stat 3: Pending Orders -->
-    <div class="card-premium p-6 space-y-4">
-      <div class="flex items-center justify-between">
-        <span class="text-xs font-bold uppercase tracking-wider text-[var(--text-muted)]">Pending</span>
-        <Clock class="h-4.5 w-4.5 text-yellow-500" />
-      </div>
-      <div>
-        <h3 class="font-heading text-2xl font-bold text-gray-900 dark:text-white">{stats.pendingOrders}</h3>
-        <p class="text-[10px] text-[var(--text-muted)] mt-1">Waiting for fulfillment</p>
-      </div>
-    </div>
-
     <!-- Stat 4: Completed Orders -->
     <div class="card-premium p-6 space-y-4">
       <div class="flex items-center justify-between">
@@ -75,6 +108,18 @@
       <div>
         <h3 class="font-heading text-2xl font-bold text-gray-900 dark:text-white">{stats.completedOrders}</h3>
         <p class="text-[10px] text-[var(--text-muted)] mt-1">Flipped orders delivered</p>
+      </div>
+    </div>
+
+    <!-- Stat 5: Pending Orders -->
+    <div class="card-premium p-6 space-y-4">
+      <div class="flex items-center justify-between">
+        <span class="text-xs font-bold uppercase tracking-wider text-[var(--text-muted)]">Pending</span>
+        <Clock class="h-4.5 w-4.5 text-yellow-500" />
+      </div>
+      <div>
+        <h3 class="font-heading text-2xl font-bold text-gray-900 dark:text-white">{stats.pendingOrders}</h3>
+        <p class="text-[10px] text-[var(--text-muted)] mt-1">Waiting for fulfillment</p>
       </div>
     </div>
 
@@ -92,23 +137,23 @@
   </div>
 
   <div class="grid gap-8 lg:grid-cols-3">
-    <!-- Chart Column (Simulated Sales Last 30 Days) -->
+    <!-- Chart Column (Real Completed Sales Last 30 Days) -->
     <div class="lg:col-span-2 space-y-4">
       <h3 class="font-heading text-xl font-bold">Sales Chart (Last 30 Days)</h3>
       <div class="card-premium p-6 flex flex-col justify-between min-h-[300px]">
         <div class="flex-1 flex items-end gap-6 pt-8">
-          {#each simulatedSales as sale}
+          {#each weeklySales as sale}
             <div class="flex-1 flex flex-col items-center gap-2">
               <span class="text-xs font-semibold text-burgundy-700 dark:text-gold-450">{formatPrice(sale.amount)}</span>
               <div
                 class="w-full bg-gradient-to-t from-burgundy-900 to-gold-500 rounded-t-lg transition-all duration-500 hover:opacity-90"
-                style="height: {Math.max(20, (sale.amount / 30000) * 150)}px"
+                style="height: {Math.max(10, (sale.amount / maxAmount) * 150)}px"
               ></div>
               <span class="text-xs font-bold text-gray-500 uppercase tracking-wider">{sale.day}</span>
             </div>
           {/each}
         </div>
-        <p class="text-center text-xs text-[var(--text-muted)] pt-6 font-semibold">Simulated weekly sales performance representation</p>
+        <p class="text-center text-xs text-[var(--text-muted)] pt-6 font-semibold">Real weekly sales performance (completed orders only)</p>
       </div>
     </div>
 

@@ -2,12 +2,8 @@ import { error } from '@sveltejs/kit';
 import type { PageServerLoad } from './$types';
 
 export const load: PageServerLoad = async ({ url, locals }) => {
-  const supabase = locals.supabase;
+  const supabase = locals.supabase as any;
   const user = locals.user;
-
-  if (!user) {
-    throw error(401, 'Unauthorized');
-  }
 
   const orderId = url.searchParams.get('id');
   if (!orderId) {
@@ -24,8 +20,11 @@ export const load: PageServerLoad = async ({ url, locals }) => {
     throw error(404, 'Order not found');
   }
 
-  if (order.user_id !== user.id) {
-    throw error(403, 'Forbidden');
+  // If order belongs to a user, make sure that user matches
+  if (order.user_id) {
+    if (!user || order.user_id !== user.id) {
+      throw error(403, 'Forbidden');
+    }
   }
 
   return {

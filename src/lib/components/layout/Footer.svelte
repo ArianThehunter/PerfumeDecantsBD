@@ -15,7 +15,7 @@
   const telegramUrl = $derived(s.telegram_url || '#');
   const address = $derived(s.address || 'Dhaka, Bangladesh');
   const phone = $derived(s.phone || '+880 1XXX-XXXXXX');
-  const emailAddr = $derived(s.email || 'hello@perfumedecantsbd.com');
+  const emailAddr = $derived(s.email || 'readusshalehin22@gmail.com');
   const copyright = $derived(s.copyright || `© ${new Date().getFullYear()} PerfumeDecantsBD. All rights reserved.`);
 
   function handleSubscribe(e: Event) {

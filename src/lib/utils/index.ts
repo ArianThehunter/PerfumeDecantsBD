@@ -10,3 +10,4 @@ export {
   debounce,
   getInitials
 } from './formatters';
+export { BANGLADESH_DISTRICTS } from './districts';

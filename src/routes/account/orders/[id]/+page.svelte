@@ -1,6 +1,8 @@
 <script lang="ts">
   import { ArrowLeft, MapPin, CreditCard, Clipboard, Calendar } from '@lucide/svelte';
   import { formatPrice, formatDate, getStatusColor } from '$lib/utils';
+  import { enhance } from '$app/forms';
+  import { toast } from 'svelte-sonner';
   import type { PageData } from './$types';
 
   let { data } = $props<{ data: PageData }>();
@@ -10,6 +12,7 @@
   
   // Parse address snapshot
   const addr = $derived(order.shipping_address as any);
+  let loading = $state(false);
 </script>
 
 <svelte:head>
@@ -40,12 +43,46 @@
       <div class="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-burgundy-50 text-burgundy-700 dark:bg-burgundy-950 dark:text-gold-400">
         <Calendar class="h-5 w-5" />
       </div>
-      <div>
+      <div class="flex-1 min-w-0">
         <h4 class="text-xs font-bold uppercase tracking-wider text-[var(--text-secondary)]">Order Status</h4>
         <span class="inline-flex mt-1 items-center rounded-full px-2.5 py-0.5 text-xs font-medium capitalize {getStatusColor(order.status)}">
           {order.status}
         </span>
         <p class="text-[10px] text-[var(--text-muted)] mt-1">Placed: {formatDate(order.created_at)}</p>
+
+        {#if order.status === 'pending' || order.status === 'confirmed'}
+          <form
+            method="post"
+            action="?/cancelOrder"
+            use:enhance={() => {
+              loading = true;
+              return async ({ result, update }) => {
+                loading = false;
+                if (result.type === 'success') {
+                  toast.success('Your order has been cancelled.');
+                  await update();
+                } else if (result.type === 'failure') {
+                  const message = (result.data as any)?.message || 'Failed to cancel order';
+                  toast.error(message);
+                }
+              };
+            }}
+            class="mt-3"
+          >
+            <button
+              type="submit"
+              disabled={loading}
+              onclick={(e) => {
+                if (!confirm('Are you sure you want to cancel this order?')) {
+                  e.preventDefault();
+                }
+              }}
+              class="w-full text-center rounded-lg border border-red-200 bg-red-50/50 hover:bg-red-50 text-red-700 dark:border-red-900/30 dark:bg-red-950/20 dark:hover:bg-red-950/40 text-xs font-semibold py-1.5 transition-colors disabled:opacity-50"
+            >
+              Cancel Order
+            </button>
+          </form>
+        {/if}
       </div>
     </div>
 

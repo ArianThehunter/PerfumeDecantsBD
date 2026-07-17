@@ -1,56 +1,26 @@
 <script lang="ts">
   import { page } from '$app/state';
   import { goto } from '$app/navigation';
-  import { createSupabaseClient } from '$lib/supabase';
+  import { enhance } from '$app/forms';
   import { Input } from '$lib/components/ui/input';
   import { Button } from '$lib/components/ui/button';
   import { toast } from 'svelte-sonner';
 
   let fullName = $state('');
   let email = $state('');
+  let phone = $state('');
   let password = $state('');
   let confirmPassword = $state('');
   let loading = $state(false);
 
-  // Initialize supabase browser client
-  const supabase = createSupabaseClient(fetch);
-
-  async function handleRegister(e: Event) {
-    e.preventDefault();
-    if (!fullName || !email || !password) return;
-
-    if (email.trim().toLowerCase() === 'admin@perfumedecantsbd.com') {
-      toast.error('Registration is restricted for this email address.');
-      return;
-    }
-
-    if (password !== confirmPassword) {
-      toast.error('Passwords do not match');
-      return;
-    }
-
-    loading = true;
-    const { error, data } = await supabase.auth.signUp({
-      email,
-      password,
-      options: {
-        data: {
-          full_name: fullName
-        }
-      }
-    });
-
-    if (error) {
-      toast.error(error.message || 'Failed to register');
-      loading = false;
-    } else {
-      toast.success('Registration successful! Please check your email to verify your account.');
-      // Auto redirect to login or check target
-      setTimeout(() => {
-        goto('/auth/login' + page.url.search);
-      }, 1500);
-    }
-  }
+  // Phone Validation Regex: 11 digits, starts with 01, numbers only
+  const phoneRegex = /^01\d{9}$/;
+  let isPhoneValid = $derived(phone === '' || phoneRegex.test(phone));
+  let phoneErrorMsg = $derived(
+    phone !== '' && !phoneRegex.test(phone)
+      ? 'Must start with 01, contain exactly 11 digits, with no spaces, dashes, or letters.'
+      : ''
+  );
 </script>
 
 <svelte:head>
@@ -72,11 +42,47 @@
       </p>
     </div>
 
-    <form class="mt-8 space-y-4" onsubmit={handleRegister}>
+    <form
+      class="mt-8 space-y-4"
+      method="POST"
+      action="?/register"
+      use:enhance={() => {
+        // Double check client side validations before submitting
+        if (!fullName || !email || !phone || !password || !confirmPassword) {
+          toast.error('All fields are required.');
+          return;
+        }
+
+        if (!phoneRegex.test(phone)) {
+          toast.error('Phone number must start with 01 and be exactly 11 digits.');
+          return;
+        }
+
+        if (password !== confirmPassword) {
+          toast.error('Passwords do not match.');
+          return;
+        }
+
+        loading = true;
+        return async ({ result }) => {
+          loading = false;
+          if (result.type === 'success') {
+            toast.success('Registration successful! Please check your email to verify your account.');
+            setTimeout(() => {
+              goto('/auth/login' + page.url.search);
+            }, 1500);
+          } else if (result.type === 'failure') {
+            const data = result.data as { message?: string };
+            toast.error(data?.message || 'Failed to register.');
+          }
+        };
+      }}
+    >
       <div class="space-y-1">
         <label for="name" class="text-xs font-bold uppercase tracking-wider text-[var(--text-secondary)]">Full Name</label>
         <Input
           id="name"
+          name="fullName"
           type="text"
           required
           placeholder="John Doe"
@@ -88,6 +94,7 @@
         <label for="email" class="text-xs font-bold uppercase tracking-wider text-[var(--text-secondary)]">Email address</label>
         <Input
           id="email"
+          name="email"
           type="email"
           required
           placeholder="yourname@example.com"
@@ -96,9 +103,26 @@
       </div>
 
       <div class="space-y-1">
+        <label for="phone" class="text-xs font-bold uppercase tracking-wider text-[var(--text-secondary)]">Phone Number</label>
+        <Input
+          id="phone"
+          name="phone"
+          type="tel"
+          required
+          placeholder="01770207576"
+          bind:value={phone}
+          class={!isPhoneValid ? 'border-red-500 focus:border-red-500 focus:ring-red-500/20' : ''}
+        />
+        {#if phoneErrorMsg}
+          <p class="text-[10px] text-red-500 font-semibold mt-0.5 leading-tight">{phoneErrorMsg}</p>
+        {/if}
+      </div>
+
+      <div class="space-y-1">
         <label for="password" class="text-xs font-bold uppercase tracking-wider text-[var(--text-secondary)]">Password</label>
         <Input
           id="password"
+          name="password"
           type="password"
           required
           placeholder="••••••••"
@@ -110,6 +134,7 @@
         <label for="confirm-password" class="text-xs font-bold uppercase tracking-wider text-[var(--text-secondary)]">Confirm Password</label>
         <Input
           id="confirm-password"
+          name="confirmPassword"
           type="password"
           required
           placeholder="••••••••"

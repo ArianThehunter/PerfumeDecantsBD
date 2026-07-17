@@ -1,11 +1,16 @@
 <script lang="ts">
   import { CheckCircle, Calendar, CreditCard, ShoppingBag, ArrowRight } from '@lucide/svelte';
   import { formatPrice } from '$lib/utils/formatters';
+  import { cart } from '$lib/stores/cart.svelte';
   import type { PageData } from './$types';
 
   let { data } = $props<{ data: PageData }>();
 
   let order = $derived(data.order);
+
+  $effect(() => {
+    cart.clearCart();
+  });
 </script>
 
 <svelte:head>

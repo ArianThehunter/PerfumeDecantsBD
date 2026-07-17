@@ -85,6 +85,12 @@
           {loading ? 'Updating...' : 'Update Status'}
         </Button>
       </form>
+
+      {#if order.status === 'cancelled'}
+        <div class="mt-3 text-xs font-semibold text-red-650 dark:text-red-400 bg-red-50/50 dark:bg-red-950/10 border border-red-200/50 dark:border-red-900/30 rounded-lg p-2.5 text-center">
+          Cancelled: {order.cancelled_at ? new Date(order.cancelled_at).toLocaleString() : 'Time not recorded'}
+        </div>
+      {/if}
     </div>
 
     <!-- Customer -->

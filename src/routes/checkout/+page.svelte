@@ -9,6 +9,7 @@
   import { Textarea } from '$lib/components/ui/textarea';
   import { toast } from 'svelte-sonner';
   import type { PageData, ActionData } from './$types';
+  import { BANGLADESH_DISTRICTS } from '$lib/utils';
 
   let { data, form } = $props<{ data: PageData; form: ActionData }>();
 
@@ -28,7 +29,31 @@
   let addressLine1 = $state('');
   let addressLine2 = $state('');
   let city = $state('');
+  let district = $state('');
   let postalCode = $state('');
+
+  // Auto-resolve current shipping details for dynamic fee calculation
+  let activeCity = $derived.by(() => {
+    if (selectedAddressId === 'new' || addresses.length === 0) {
+      return city;
+    }
+    const found = addresses.find((a: any) => a.id === selectedAddressId);
+    return found ? found.city : city;
+  });
+
+  let activeDistrict = $derived.by(() => {
+    if (selectedAddressId === 'new' || addresses.length === 0) {
+      return district;
+    }
+    const found = addresses.find((a: any) => a.id === selectedAddressId);
+    return found ? found.district : district;
+  });
+
+  // Calculate dynamic shipping cost: Dhaka district AND dhaka city -> ৳80, otherwise ৳140
+  let shippingCost = $derived(
+    (activeDistrict === 'Dhaka' && activeCity?.trim().toLowerCase() === 'dhaka') ? 80 : 140
+  );
+  let grandTotal = $derived(cart.subtotal + shippingCost);
 
   $effect(() => {
     if (addresses.length > 0 && selectedAddressId === 'new') {
@@ -157,9 +182,27 @@
                     <Input id="city" name="city" type="text" placeholder="Dhaka" required bind:value={city} />
                   </div>
                   <div class="space-y-1">
-                    <label for="postalCode" class="text-xs font-bold uppercase tracking-wider text-[var(--text-secondary)]">Postal Code</label>
-                    <Input id="postalCode" name="postalCode" type="text" placeholder="1212" required bind:value={postalCode} />
+                    <label for="district" class="text-xs font-bold uppercase tracking-wider text-[var(--text-secondary)]">District</label>
+                    <input
+                      id="district"
+                      name="district"
+                      list="districts-list"
+                      required
+                      placeholder="Select District"
+                      bind:value={district}
+                      class="flex h-10 w-full rounded-md border border-gray-300 dark:border-gray-800 bg-white dark:bg-gray-900 px-3 py-2 text-sm text-gray-900 dark:text-gray-100 placeholder:text-gray-400 dark:placeholder:text-gray-500 focus:outline-none focus:ring-2 focus:ring-burgundy-500/20 dark:focus:ring-gold-500/20"
+                    />
+                    <datalist id="districts-list">
+                      {#each BANGLADESH_DISTRICTS as dist}
+                        <option value={dist}></option>
+                      {/each}
+                    </datalist>
                   </div>
+                </div>
+
+                <div class="space-y-1">
+                  <label for="postalCode" class="text-xs font-bold uppercase tracking-wider text-[var(--text-secondary)]">Postal Code</label>
+                  <Input id="postalCode" name="postalCode" type="text" placeholder="1212" required bind:value={postalCode} />
                 </div>
               </div>
             {/if}
@@ -229,10 +272,45 @@
                   <ol class="list-decimal pl-4 space-y-1">
                     <li>Open your **bKash** or **Nagad** app (or use *247# / *167#).</li>
                     <li>Select **Send Money** (Personal account).</li>
-                    <li>Enter Number: <strong class="text-burgundy-900 dark:text-gold-400">017XX-XXXXXX</strong> (bKash) or <strong class="text-burgundy-900 dark:text-gold-400">019XX-XXXXXX</strong> (Nagad).</li>
+                    <li>Enter Number: <strong class="text-burgundy-900 dark:text-gold-400">01770207576</strong> (bKash) or <strong class="text-burgundy-900 dark:text-gold-400">01770207576</strong> (Nagad).</li>
                     <li>Send the exact grand total.</li>
                     <li>Keep the Transaction ID (TxnID) and enter it below.</li>
                   </ol>
+                </div>
+
+                <div class="mt-4 rounded-xl border border-gray-200 bg-white dark:border-gray-800 dark:bg-gray-900/50 p-4 space-y-3">
+                  <div class="flex items-center justify-between border-b pb-2 border-gray-150 dark:border-gray-850">
+                    <span class="font-bold text-gray-950 dark:text-cream-200">NRB Commercial Bank Ltd</span>
+                    <span class="text-[10px] uppercase font-bold tracking-wider text-gold-500">Bank Details</span>
+                  </div>
+                  <div class="space-y-2 text-[11px] text-[var(--text-secondary)]">
+                    <div class="flex justify-between items-center">
+                      <span>Account Name:</span>
+                      <span class="font-semibold text-gray-950 dark:text-white">Md Readus Shalehin</span>
+                    </div>
+                    <div class="flex justify-between items-center">
+                      <span>Account Number:</span>
+                      <div class="flex items-center gap-1.5 font-mono font-bold text-gray-950 dark:text-white">
+                        <span>520031100001718</span>
+                        <button type="button" aria-label="Copy Account Number" class="text-gray-400 hover:text-burgundy-700 dark:hover:text-gold-400" onclick={() => { navigator.clipboard.writeText('520031100001718'); toast.success('Account number copied!'); }}>
+                          <svg class="h-3.5 w-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg>
+                        </button>
+                      </div>
+                    </div>
+                    <div class="flex justify-between items-center">
+                      <span>Branch:</span>
+                      <span class="font-semibold text-gray-950 dark:text-white">Mirpur 12</span>
+                    </div>
+                    <div class="flex justify-between items-center">
+                      <span>Routing Number:</span>
+                      <div class="flex items-center gap-1.5 font-mono font-bold text-gray-950 dark:text-white">
+                        <span>260261089</span>
+                        <button type="button" aria-label="Copy Routing Number" class="text-gray-400 hover:text-burgundy-700 dark:hover:text-gold-400" onclick={() => { navigator.clipboard.writeText('260261089'); toast.success('Routing number copied!'); }}>
+                          <svg class="h-3.5 w-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg>
+                        </button>
+                      </div>
+                    </div>
+                  </div>
                 </div>
                 
                 <hr class="border-gray-200 dark:border-gray-800" />
@@ -263,7 +341,7 @@
             {#if loading}
               Processing Order...
             {:else}
-              Place Order — {formatPrice(cart.total)}
+              Place Order — {formatPrice(grandTotal)}
             {/if}
           </Button>
         </form>
@@ -302,17 +380,13 @@
             <div class="flex justify-between">
               <span>Shipping Fee</span>
               <span class="text-gray-900 dark:text-white font-bold">
-                {#if cart.shippingCost === 0}
-                  <span class="text-green-600">Free</span>
-                {:else}
-                  {formatPrice(cart.shippingCost)}
-                {/if}
+                {formatPrice(shippingCost)}
               </span>
             </div>
             <hr class="border-gray-100 dark:border-gray-800" />
             <div class="flex justify-between text-sm">
               <span class="font-heading font-bold text-gray-900 dark:text-white">Grand Total</span>
-              <span class="font-heading font-bold text-burgundy-700 dark:text-gold-400">{formatPrice(cart.total)}</span>
+              <span class="font-heading font-bold text-burgundy-700 dark:text-gold-400">{formatPrice(grandTotal)}</span>
             </div>
           </div>
         </div>

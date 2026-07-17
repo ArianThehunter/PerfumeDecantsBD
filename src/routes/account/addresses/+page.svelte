@@ -6,6 +6,7 @@
   import { toast } from 'svelte-sonner';
   import * as Dialog from '$lib/components/ui/dialog';
   import type { ActionData, PageData } from './$types';
+  import { BANGLADESH_DISTRICTS } from '$lib/utils';
 
   let { data, form } = $props<{ data: PageData; form: ActionData }>();
 
@@ -85,7 +86,7 @@
               {#if addr.address_line_2}
                 <br />{addr.address_line_2}
               {/if}
-              <br />{addr.city} - {addr.postal_code}
+              <br />{addr.city}{addr.district ? `, ${addr.district}` : ''} - {addr.postal_code}
             </p>
           </div>
 
@@ -182,9 +183,24 @@
           <Input id="city" name="city" type="text" placeholder="Dhaka, Chittagong, etc." required />
         </div>
         <div>
-          <label for="postalCode" class="text-xs font-bold uppercase tracking-wider text-[var(--text-secondary)]">Postal Code</label>
-          <Input id="postalCode" name="postalCode" type="text" placeholder="1212" required />
+          <label for="district" class="text-xs font-bold uppercase tracking-wider text-[var(--text-secondary)]">District</label>
+          <select
+            id="district"
+            name="district"
+            required
+            class="flex h-10 w-full items-center justify-between rounded-md border border-gray-300 dark:border-gray-800 bg-white dark:bg-gray-900 px-3 py-2 text-sm text-gray-900 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-burgundy-500/20 dark:focus:ring-gold-500/20"
+          >
+            <option value="" disabled selected>Select District</option>
+            {#each BANGLADESH_DISTRICTS as dist}
+              <option value={dist}>{dist}</option>
+            {/each}
+          </select>
         </div>
+      </div>
+
+      <div>
+        <label for="postalCode" class="text-xs font-bold uppercase tracking-wider text-[var(--text-secondary)]">Postal Code</label>
+        <Input id="postalCode" name="postalCode" type="text" placeholder="1212" required />
       </div>
 
       <div class="flex items-center gap-2 pt-2">
