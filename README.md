@@ -13,7 +13,6 @@ A luxurious e-commerce platform built for purchasing high-end perfume decants. F
 - **Admin Dashboard**: Manage products, categories, orders, and site settings.
 - **Storage**: Direct local image uploads to Supabase storage.
 - **Dark/Light Mode**: Full synchronized UI theming.
-
 ## Local Development
 1. Clone the repository
 2. Run `npm install` to install dependencies
