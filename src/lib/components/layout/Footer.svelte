@@ -66,6 +66,7 @@
             { href: '/shop', label: 'Shop All' },
             { href: '/about', label: 'About Us' },
             { href: '/contact', label: 'Contact' },
+            { href: '/faq', label: 'FAQ' },
             { href: '/auth/login', label: 'My Account' }
           ] as link}
             <li>

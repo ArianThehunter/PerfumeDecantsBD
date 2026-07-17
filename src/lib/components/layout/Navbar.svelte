@@ -12,7 +12,8 @@
     { href: '/', label: 'Home' },
     { href: '/shop', label: 'Shop' },
     { href: '/about', label: 'About' },
-    { href: '/contact', label: 'Contact' }
+    { href: '/contact', label: 'Contact' },
+    { href: '/faq', label: 'FAQ' }
   ];
 
   function handleScroll() {
