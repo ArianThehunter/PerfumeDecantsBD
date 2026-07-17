@@ -110,7 +110,7 @@
               id="categoryId"
               name="categoryId"
               value={product.category_id || ''}
-              class="flex h-10 w-full rounded-xl border border-gray-300 dark:border-gray-800 bg-white dark:bg-gray-900 px-3.5 py-2 text-sm text-[var(--text-primary)] focus:outline-none focus:border-burgundy-600 focus:ring-2 focus:ring-burgundy-500/20 dark:focus:border-gold-500 dark:focus:ring-gold-500/20 transition-all"
+              class="flex h-10 w-full rounded-xl border border-gray-300 dark:border-gray-800 bg-white dark:bg-gray-900 px-3.5 py-2 text-sm text-gray-900 dark:text-gray-100 focus:outline-none focus:border-burgundy-600 focus:ring-2 focus:ring-burgundy-500/20 dark:focus:border-gold-500 dark:focus:ring-gold-500/20 transition-all"
             >
               <option value="">Select Category</option>
               {#each categories as cat}
@@ -243,7 +243,7 @@
               id="gender"
               name="gender"
               value={product.gender}
-              class="flex h-10 w-full rounded-xl border border-gray-300 dark:border-gray-800 bg-white dark:bg-gray-900 px-3.5 py-2 text-sm text-[var(--text-primary)] focus:outline-none focus:border-burgundy-600 focus:ring-2 focus:ring-burgundy-500/20 dark:focus:border-gold-500 dark:focus:ring-gold-500/20 transition-all"
+              class="flex h-10 w-full rounded-xl border border-gray-300 dark:border-gray-800 bg-white dark:bg-gray-900 px-3.5 py-2 text-sm text-gray-900 dark:text-gray-100 focus:outline-none focus:border-burgundy-600 focus:ring-2 focus:ring-burgundy-500/20 dark:focus:border-gold-500 dark:focus:ring-gold-500/20 transition-all"
             >
               <option value="unisex">Unisex</option>
               <option value="men">Men</option>
@@ -263,7 +263,7 @@
             id="status"
             name="status"
             value={product.status}
-            class="flex h-10 w-full rounded-xl border border-gray-300 dark:border-gray-800 bg-white dark:bg-gray-900 px-3.5 py-2 text-sm text-[var(--text-primary)] focus:outline-none focus:border-burgundy-600 focus:ring-2 focus:ring-burgundy-500/20 dark:focus:border-gold-500 dark:focus:ring-gold-500/20 transition-all"
+            class="flex h-10 w-full rounded-xl border border-gray-300 dark:border-gray-800 bg-white dark:bg-gray-900 px-3.5 py-2 text-sm text-gray-900 dark:text-gray-100 focus:outline-none focus:border-burgundy-600 focus:ring-2 focus:ring-burgundy-500/20 dark:focus:border-gold-500 dark:focus:ring-gold-500/20 transition-all"
           >
             <option value="active">Active</option>
             <option value="draft">Draft</option>

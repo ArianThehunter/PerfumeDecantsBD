@@ -1,12 +1,13 @@
 <script lang="ts">
+  import { enhance } from '$app/forms';
   import { Mail, Phone, MapPin, Clock, Send } from '@lucide/svelte';
   import { Button } from '$lib/components/ui/button';
   import { Input } from '$lib/components/ui/input';
   import { Textarea } from '$lib/components/ui/textarea';
   import { toast } from 'svelte-sonner';
-  import type { PageData } from './$types';
+  import type { PageData, ActionData } from './$types';
 
-  let { data } = $props<{ data: PageData }>();
+  let { data, form } = $props<{ data: PageData; form: ActionData }>();
 
   // Dynamic Settings
   const s = $derived(data.contactSettings || {});
@@ -16,7 +17,7 @@
   const formSubtitle = $derived(s.form_subtitle || 'We typically respond within 24 business hours.');
   const address = $derived(s.address || 'Dhaka, Bangladesh');
   const phone = $derived(s.phone || '+880 1XXX-XXXXXX');
-  const emailVal = $derived(s.email || 'hello@perfumedecantsbd.com');
+  const emailVal = 'readusshalehin22@gmail.com';
   const hours = $derived(s.hours || 'Sat - Thu: 10AM - 8PM');
 
   let name = $state('');
@@ -25,20 +26,17 @@
   let message = $state('');
   let submitting = $state(false);
 
-  function handleSubmit(e: Event) {
-    e.preventDefault();
-    submitting = true;
-    
-    // Simulate API call
-    setTimeout(() => {
-      submitting = false;
+  $effect(() => {
+    if (form?.success) {
       toast.success('Your message has been sent successfully. We will get back to you shortly.');
       name = '';
       email = '';
       subject = '';
       message = '';
-    }, 1500);
-  }
+    } else if (form?.message) {
+      toast.error(form.message);
+    }
+  });
 </script>
 
 <svelte:head>
@@ -70,25 +68,36 @@
           <h2 class="font-heading text-2xl font-bold text-burgundy-900 dark:text-gold-400">{formTitle}</h2>
           <p class="mt-2 text-sm text-[var(--text-muted)]">{formSubtitle}</p>
 
-          <form onsubmit={handleSubmit} class="mt-6 space-y-4">
+          <form
+            method="post"
+            action="?/submitMessage"
+            use:enhance={() => {
+              submitting = true;
+              return async ({ update }) => {
+                submitting = false;
+                await update();
+              };
+            }}
+            class="mt-6 space-y-4"
+          >
             <div>
               <label for="name" class="text-xs font-bold uppercase tracking-wider text-[var(--text-secondary)]">Your Name</label>
-              <Input id="name" type="text" placeholder="Enter your full name" required bind:value={name} class="mt-1" />
+              <Input id="name" name="name" type="text" placeholder="Enter your full name" required bind:value={name} class="mt-1" />
             </div>
 
             <div>
               <label for="email" class="text-xs font-bold uppercase tracking-wider text-[var(--text-secondary)]">Email Address</label>
-              <Input id="email" type="email" placeholder="hello@example.com" required bind:value={email} class="mt-1" />
+              <Input id="email" name="email" type="email" placeholder="hello@example.com" required bind:value={email} class="mt-1" />
             </div>
 
             <div>
               <label for="subject" class="text-xs font-bold uppercase tracking-wider text-[var(--text-secondary)]">Subject</label>
-              <Input id="subject" type="text" placeholder="How can we help?" required bind:value={subject} class="mt-1" />
+              <Input id="subject" name="subject" type="text" placeholder="How can we help?" required bind:value={subject} class="mt-1" />
             </div>
 
             <div>
               <label for="message" class="text-xs font-bold uppercase tracking-wider text-[var(--text-secondary)]">Message</label>
-              <Textarea id="message" rows={5} placeholder="Write your message here..." required bind:value={message} class="mt-1" />
+              <Textarea id="message" name="message" rows={5} placeholder="Write your message here..." required bind:value={message} class="mt-1" />
             </div>
 
             <Button
@@ -133,7 +142,7 @@
                 <Mail class="h-5 w-5" />
               </div>
               <h3 class="mt-4 font-heading text-base font-bold">Email Atelier</h3>
-              <p class="mt-2 text-sm text-[var(--text-muted)]">{emailVal}</p>
+              <a href="mailto:{emailVal}" class="mt-2 text-sm text-[var(--text-muted)] hover:text-burgundy-700 dark:hover:text-gold-400 break-all">{emailVal}</a>
             </div>
 
             <!-- Hours -->
@@ -143,16 +152,6 @@
               </div>
               <h3 class="mt-4 font-heading text-base font-bold">Business Hours</h3>
               <p class="mt-2 text-sm text-[var(--text-muted)]">{hours}</p>
-            </div>
-          </div>
-
-          <!-- Map Placeholder -->
-          <div class="relative overflow-hidden rounded-2xl border border-gray-150 aspect-video bg-gray-50 dark:bg-gray-900 dark:border-gray-800 flex items-center justify-center">
-            <div class="absolute inset-0 bg-cover bg-center filter grayscale opacity-30" style="background-image: url('https://images.unsplash.com/photo-1524661135-423995f22d0b?w=600')"></div>
-            <div class="relative z-10 text-center space-y-2 px-6">
-              <MapPin class="mx-auto h-8 w-8 text-burgundy-700 dark:text-gold-400 animate-float" />
-              <h4 class="font-heading font-bold text-sm">Interactive Map</h4>
-              <p class="text-xs text-[var(--text-muted)]">{address}</p>
             </div>
           </div>
         </div>

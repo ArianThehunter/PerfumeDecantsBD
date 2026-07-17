@@ -29,40 +29,7 @@
 </script>
 
 <footer class="bg-burgundy-950 text-cream-200">
-  <!-- Newsletter Band -->
-  <div class="border-b border-burgundy-900">
-    <div class="container-luxury py-12">
-      <div class="flex flex-col items-center gap-6 text-center lg:flex-row lg:justify-between lg:text-left">
-        <div>
-          <h3 class="font-heading text-2xl font-bold text-white">{newsletterTitle}</h3>
-          <p class="mt-1 text-sm text-cream-300/70">{newsletterDesc}</p>
-        </div>
-        <form onsubmit={handleSubscribe} class="flex w-full max-w-md gap-2">
-          <div class="relative flex-1">
-            <Mail class="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-cream-400/50" />
-            <input
-              type="email"
-              bind:value={email}
-              placeholder="Enter your email"
-              required
-              class="w-full rounded-lg border border-burgundy-800 bg-burgundy-900/50 py-2.5 pl-10 pr-4 text-sm text-white placeholder-cream-400/50 transition-all focus:border-gold-500 focus:outline-none focus:ring-1 focus:ring-gold-500/30"
-            />
-          </div>
-          <button
-            type="submit"
-            class="btn-press flex items-center gap-2 rounded-lg bg-gold-500 px-5 py-2.5 text-sm font-semibold text-burgundy-950 transition-all hover:bg-gold-400"
-          >
-            {#if subscribed}
-              ✓ Subscribed
-            {:else}
-              Subscribe
-              <ArrowRight class="h-4 w-4" />
-            {/if}
-          </button>
-        </form>
-      </div>
-    </div>
-  </div>
+
 
   <!-- Main Footer -->
   <div class="container-luxury py-16">
@@ -87,24 +54,6 @@
             aria-label="Facebook"
           >
             <svg class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 2h-3a5 5 0 0 0-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 0 1 1-1h3z"></path></svg>
-          </a>
-          <a
-            href={instaUrl}
-            target="_blank"
-            rel="noopener noreferrer"
-            class="flex h-9 w-9 items-center justify-center rounded-full bg-burgundy-900 text-cream-300 transition-all hover:bg-gold-500 hover:text-burgundy-950"
-            aria-label="Instagram"
-          >
-            <svg class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="2" width="20" height="20" rx="5" ry="5"></rect><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"></path><line x1="17.5" y1="6.5" x2="17.51" y2="6.5"></line></svg>
-          </a>
-          <a
-            href={telegramUrl}
-            target="_blank"
-            rel="noopener noreferrer"
-            class="flex h-9 w-9 items-center justify-center rounded-full bg-burgundy-900 text-cream-300 transition-all hover:bg-gold-500 hover:text-burgundy-950"
-            aria-label="Telegram"
-          >
-            <Send class="h-4 w-4" />
           </a>
         </div>
       </div>

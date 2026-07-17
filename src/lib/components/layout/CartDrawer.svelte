@@ -8,10 +8,10 @@
 </script>
 
 <Sheet.Root open={cart.isOpen} onOpenChange={(open) => { if (!open) cart.closeCart(); }}>
-  <Sheet.Content side="right" class="w-full max-w-md p-0 sm:max-w-lg [&>button]:hidden">
+  <Sheet.Content side="right" class="w-full max-w-md p-0 sm:max-w-lg [&>button]:hidden bg-white dark:bg-gray-950 text-gray-900 dark:text-gray-100 border-l border-gray-200 dark:border-gray-800">
     <div class="flex h-full flex-col">
       <!-- Header -->
-      <div class="flex items-center justify-between border-b px-6 py-4">
+      <div class="flex items-center justify-between border-b border-gray-100 dark:border-gray-800 px-6 py-4">
         <div class="flex items-center gap-2">
           <ShoppingBag class="h-5 w-5 text-burgundy-700 dark:text-gold-400" />
           <Sheet.Title class="font-heading text-lg font-bold">
@@ -115,7 +115,7 @@
         </div>
 
         <!-- Footer / Summary -->
-        <div class="border-t px-6 py-4">
+        <div class="border-t border-gray-100 dark:border-gray-800 px-6 py-4">
           <div class="space-y-2">
             <div class="flex justify-between text-sm">
               <span class="text-gray-500">Subtotal</span>

@@ -68,7 +68,7 @@
         <select
           name="status"
           value={order.status}
-          class="flex h-10 w-full items-center justify-between rounded-md border border-input bg-background px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-ring"
+          class="flex h-10 w-full items-center justify-between rounded-md border border-gray-300 dark:border-gray-800 bg-white dark:bg-gray-900 px-3 py-2 text-sm text-gray-900 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-burgundy-500/20 dark:focus:ring-gold-500/20"
         >
           <option value="pending">Pending</option>
           <option value="confirmed">Confirmed</option>

@@ -41,6 +41,35 @@ export interface Database {
           updated_at?: string;
         };
       };
+      contact_messages: {
+        Row: {
+          id: string;
+          name: string;
+          email: string;
+          subject: string;
+          message: string;
+          is_read: boolean;
+          created_at: string;
+        };
+        Insert: {
+          id?: string;
+          name: string;
+          email: string;
+          subject: string;
+          message: string;
+          is_read?: boolean;
+          created_at?: string;
+        };
+        Update: {
+          id?: string;
+          name?: string;
+          email?: string;
+          subject?: string;
+          message?: string;
+          is_read?: boolean;
+          created_at?: string;
+        };
+      };
       categories: {
         Row: {
           id: string;
@@ -331,6 +360,7 @@ export type ProductImage = Database['public']['Tables']['product_images']['Row']
 export type Address = Database['public']['Tables']['addresses']['Row'];
 export type Order = Database['public']['Tables']['orders']['Row'];
 export type OrderItem = Database['public']['Tables']['order_items']['Row'];
+export type ContactMessage = Database['public']['Tables']['contact_messages']['Row'];
 
 // Extended types with relations
 export type ProductWithImages = Product & {

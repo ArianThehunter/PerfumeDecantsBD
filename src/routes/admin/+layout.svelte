@@ -2,7 +2,7 @@
   import { page } from '$app/state';
   import { goto } from '$app/navigation';
   import { createSupabaseClient } from '$lib/supabase';
-  import { LayoutDashboard, ShoppingBag, FolderHeart, FileSpreadsheet, Home, LogOut, Sun, Moon, Settings } from '@lucide/svelte';
+  import { LayoutDashboard, ShoppingBag, FolderHeart, FileSpreadsheet, Home, LogOut, Sun, Moon, Settings, Mail } from '@lucide/svelte';
   import { theme } from '$lib/stores/theme.svelte';
   import { toast } from 'svelte-sonner';
 
@@ -15,6 +15,7 @@
     { href: '/admin/products', label: 'Products', icon: ShoppingBag },
     { href: '/admin/categories', label: 'Categories', icon: FolderHeart },
     { href: '/admin/orders', label: 'Orders', icon: FileSpreadsheet },
+    { href: '/admin/contact-messages', label: 'Contact Messages', icon: Mail },
     { href: '/admin/settings', label: 'Settings', icon: Settings }
   ];
 

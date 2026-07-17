@@ -30,7 +30,7 @@ export const load: PageServerLoad = async ({ locals }) => {
     .from('orders')
     .select('total')
     .neq('status', 'cancelled');
-  const revenue = revenueData?.reduce((sum, item) => sum + Number(item.total), 0) || 0;
+  const revenue = revenueData?.reduce((sum: number, item: any) => sum + Number(item.total), 0) || 0;
 
   // 6. Recent Orders
   const { data: recentOrders } = await supabase

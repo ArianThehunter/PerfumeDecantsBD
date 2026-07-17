@@ -2,7 +2,7 @@
   import { page } from '$app/state';
   import { cart } from '$lib/stores/cart.svelte';
   import { theme } from '$lib/stores/theme.svelte';
-  import { ShoppingBag, Menu, X, Search, User, Sun, Moon, Heart, ChevronDown } from '@lucide/svelte';
+  import { ShoppingBag, Menu, X, Search, User, Sun, Moon, Package, ChevronDown } from '@lucide/svelte';
 
   let scrolled = $state(false);
   let mobileMenuOpen = $state(false);
@@ -92,13 +92,13 @@
           <Search class="h-5 w-5" />
         </button>
 
-        <!-- Wishlist Placeholder -->
+        <!-- Orders Link -->
         <a
-          href="/shop"
+          href="/account/orders"
           class="btn-press hidden h-10 w-10 items-center justify-center rounded-full text-gray-700 transition-colors hover:bg-burgundy-50 hover:text-burgundy-700 dark:text-gray-300 dark:hover:bg-burgundy-950 dark:hover:text-gold-400 sm:flex"
-          aria-label="Wishlist"
+          aria-label="My Orders"
         >
-          <Heart class="h-5 w-5" />
+          <Package class="h-5 w-5" />
         </a>
 
         <!-- Theme Toggle -->

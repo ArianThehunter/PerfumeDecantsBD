@@ -8,8 +8,8 @@ export const load: PageServerLoad = async ({ url, locals }) => {
   const categorySlug = url.searchParams.get('category') || '';
   const brand = url.searchParams.get('brand') || '';
   const gender = url.searchParams.get('gender') || '';
-  const minPrice = Number(url.searchParams.get('min_price')) || 0;
-  const maxPrice = Number(url.searchParams.get('max_price')) || 10000;
+  const minPrice = Number(url.searchParams.get('min_price')) || 200;
+  const maxPrice = Number(url.searchParams.get('max_price')) || 20000;
   const sort = url.searchParams.get('sort') || 'popular';
   const page = Number(url.searchParams.get('page')) || 1;
   const perPage = 12;
@@ -26,7 +26,7 @@ export const load: PageServerLoad = async ({ url, locals }) => {
     .from('products')
     .select('brand')
     .eq('status', 'active');
-  const brands = Array.from(new Set(allProductsForBrands?.map(p => p.brand) || []));
+  const brands = Array.from(new Set(allProductsForBrands?.map((p: any) => p.brand) || []));
 
   // 3. Build main query
   let query = supabase
@@ -59,13 +59,8 @@ export const load: PageServerLoad = async ({ url, locals }) => {
     query = query.eq('gender', gender);
   }
 
-  if (minPrice > 0) {
-    query = query.gte('price', minPrice);
-  }
-
-  if (maxPrice < 10000) {
-    query = query.lte('price', maxPrice);
-  }
+  query = query.gte('price', minPrice);
+  query = query.lte('price', maxPrice);
 
   // Sorting
   if (sort === 'newest') {

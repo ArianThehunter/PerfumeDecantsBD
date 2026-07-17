@@ -11,7 +11,7 @@ export const load: LayoutServerLoad = async ({ locals }) => {
 
   const settings: Record<string, any> = {};
   if (settingsData) {
-    settingsData.forEach((row) => {
+    settingsData.forEach((row: any) => {
       settings[row.key] = row.value;
     });
   }

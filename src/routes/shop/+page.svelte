@@ -7,6 +7,7 @@
   import { cart } from '$lib/stores/cart.svelte';
   import { formatPrice } from '$lib/utils/formatters';
   import { toast } from 'svelte-sonner';
+  import PriceSlider from '$lib/components/ui/PriceSlider.svelte';
   import type { PageData } from './$types';
 
   let { data } = $props<{ data: PageData }>();
@@ -182,7 +183,7 @@
           <select
             value={filters.sort}
             onchange={(e) => updateFilters({ sort: (e.target as HTMLSelectElement).value })}
-            class="flex h-10 w-full items-center justify-between rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
+            class="flex h-10 w-full items-center justify-between rounded-md border border-gray-300 dark:border-gray-800 bg-white dark:bg-gray-900 px-3 py-2 text-sm text-gray-900 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-burgundy-500/20 dark:focus:ring-gold-500/20 disabled:cursor-not-allowed disabled:opacity-50"
             aria-label="Sort products"
           >
             <option value="popular">Sort: Popular</option>
@@ -299,27 +300,14 @@
         <!-- Price Range -->
         <div>
           <h3 class="font-heading text-base font-bold text-burgundy-850 dark:text-cream-200">Price Range</h3>
-          <div class="mt-4 space-y-4">
-            <div class="flex gap-2">
-              <div class="flex-1">
-                <label for="min-price" class="text-xs text-[var(--text-muted)] uppercase">Min (৳)</label>
-                <Input
-                  id="min-price"
-                  type="number"
-                  value={filters.minPrice}
-                  onchange={(e: any) => updateFilters({ min_price: (e.target as HTMLInputElement).value })}
-                />
-              </div>
-              <div class="flex-1">
-                <label for="max-price" class="text-xs text-[var(--text-muted)] uppercase">Max (৳)</label>
-                <Input
-                  id="max-price"
-                  type="number"
-                  value={filters.maxPrice}
-                  onchange={(e: any) => updateFilters({ max_price: (e.target as HTMLInputElement).value })}
-                />
-              </div>
-            </div>
+          <div class="mt-4">
+            <PriceSlider
+              min={filters.minPrice}
+              max={filters.maxPrice}
+              rangeMin={200}
+              rangeMax={20000}
+              onchange={(min, max) => updateFilters({ min_price: min, max_price: max })}
+            />
           </div>
         </div>
       </aside>
@@ -408,7 +396,7 @@
                           {formatPrice(product.price)}
                         </span>
                       {/if}
-                      <span class="block text-[10px] text-gray-500">From decant size</span>
+                      <span class="block text-[10px] text-gray-500">Starting from</span>
                     </div>
                     <div>
                       <span class="text-xs font-medium {product.stock_quantity > 0 ? 'text-green-600' : 'text-red-500'} block text-right">
@@ -573,6 +561,20 @@
                 {b}
               </button>
             {/each}
+          </div>
+        </div>
+
+        <!-- Mobile Price Range -->
+        <div>
+          <h3 class="font-heading text-sm font-bold text-burgundy-850 dark:text-cream-200">Price Range</h3>
+          <div class="mt-4">
+            <PriceSlider
+              min={filters.minPrice}
+              max={filters.maxPrice}
+              rangeMin={200}
+              rangeMax={20000}
+              onchange={(min, max) => updateFilters({ min_price: min, max_price: max })}
+            />
           </div>
         </div>
       </div>
