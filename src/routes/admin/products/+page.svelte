@@ -14,7 +14,7 @@
   let loading = $state(false);
 
   const filteredProducts = $derived(
-    products.filter((prod) => {
+    products.filter((prod: any) => {
       const query = searchQuery.toLowerCase();
       return (
         prod.name.toLowerCase().includes(query) ||

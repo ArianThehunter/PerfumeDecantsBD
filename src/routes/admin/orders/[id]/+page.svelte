@@ -94,14 +94,14 @@
         Customer Contact
       </div>
       <div class="space-y-1.5 text-xs">
-        <p class="font-bold text-gray-900 dark:text-white">{addr?.full_name || order.profiles?.full_name}</p>
+        <p class="font-bold text-gray-900 dark:text-white">{addr?.full_name || 'Guest'}</p>
         <p class="flex items-center gap-1.5 text-[var(--text-secondary)]">
           <Mail class="h-3.5 w-3.5 text-gray-400" />
-          {order.profiles?.email || 'N/A'}
+          {addr?.email || 'N/A'}
         </p>
         <p class="flex items-center gap-1.5 text-[var(--text-secondary)]">
           <Phone class="h-3.5 w-3.5 text-gray-400" />
-          {addr?.phone || order.profiles?.phone || 'N/A'}
+          {addr?.phone || 'N/A'}
         </p>
       </div>
     </div>

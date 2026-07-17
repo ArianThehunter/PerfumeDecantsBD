@@ -1,42 +1,27 @@
-# sv
+# PerfumeDecantsBD
 
-Everything you need to build a Svelte project, powered by [`sv`](https://github.com/sveltejs/cli).
+A luxurious e-commerce platform built for purchasing high-end perfume decants. Features a beautiful user interface with dark/light mode, guest checkout, and a complete admin dashboard for store management.
 
-## Creating a project
+## Tech Stack
+- **Frontend**: SvelteKit, Tailwind CSS
+- **Backend & Database**: Supabase (PostgreSQL, Storage, Authentication)
+- **Deployment**: Vercel
 
-If you're seeing this, you've probably already done this step. Congrats!
+## Key Features
+- **Guest Checkout**: Place orders without requiring an account.
+- **Dynamic Carts**: Carts are saved locally and isolated per user.
+- **Admin Dashboard**: Manage products, categories, orders, and site settings.
+- **Storage**: Direct local image uploads to Supabase storage.
+- **Dark/Light Mode**: Full synchronized UI theming.
 
-```sh
-# create a new project
-npx sv create my-app
-```
+## Local Development
+1. Clone the repository
+2. Run `npm install` to install dependencies
+3. Copy `.env.example` to `.env` and fill in your Supabase details
+4. Run `npm run dev` to start the local development server
 
-To recreate this project with the same configuration:
+## Database Setup
+Run the SQL migration scripts located in `supabase/migrations/` in order on your Supabase SQL editor to set up the tables, policies, and storage buckets.
 
-```sh
-# recreate this project
-npx sv@0.16.3 create --template minimal --types ts --no-install ./
-```
-
-## Developing
-
-Once you've created a project and installed dependencies with `npm install` (or `pnpm install` or `yarn`), start a development server:
-
-```sh
-npm run dev
-
-# or start the server and open the app in a new browser tab
-npm run dev -- --open
-```
-
-## Building
-
-To create a production version of your app:
-
-```sh
-npm run build
-```
-
-You can preview the production build with `npm run preview`.
-
-> To deploy your app, you may need to install an [adapter](https://svelte.dev/docs/kit/adapters) for your target environment.
+## Deployment
+This project is configured with `@sveltejs/adapter-vercel`. Simply import the repository into Vercel and provide the `.env` variables for a seamless deployment.

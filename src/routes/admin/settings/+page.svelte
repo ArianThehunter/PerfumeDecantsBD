@@ -9,8 +9,15 @@
   let { data, form } = $props<{ data: PageData; form: ActionData }>();
 
   let settings = $derived(data.settings);
-  let activeTab = $state<'footer' | 'about' | 'contact' | 'shop'>('footer');
+  let activeTab = $state<'footer' | 'about' | 'contact' | 'shop' | 'hero'>('footer');
   let loading = $state(false);
+  let selectedHeroProductIds = $state<string[]>([]);
+
+  $effect(() => {
+    if (data.settings?.hero_slides?.product_ids) {
+      selectedHeroProductIds = [...data.settings.hero_slides.product_ids];
+    }
+  });
 
   $effect(() => {
     if (form?.success) {
@@ -39,7 +46,8 @@
       { key: 'footer', label: 'Footer & Brands' },
       { key: 'about', label: 'About Us Page' },
       { key: 'contact', label: 'Contact Us Page' },
-      { key: 'shop', label: 'Shop Page' }
+      { key: 'shop', label: 'Shop Page' },
+      { key: 'hero', label: 'Hero Slider' }
     ] as tab}
       <button
         onclick={() => (activeTab = tab.key as any)}
@@ -286,6 +294,67 @@
         <div class="pt-4">
           <Button type="submit" disabled={loading} class="bg-burgundy-700 hover:bg-burgundy-800 text-white font-semibold">
             {loading ? 'Saving Shop Config...' : 'Save Shop Page'}
+          </Button>
+        </div>
+      </form>
+    {/if}
+
+    <!-- Hero Slider settings -->
+    {#if activeTab === 'hero'}
+      {@const hs = settings.hero_slides || { product_ids: [] }}
+      {@const allProducts = data.products || []}
+      <form
+        method="post"
+        action="?/updateHeroSlides"
+        use:enhance={() => {
+          loading = true;
+          return async ({ update }) => {
+            loading = false;
+            await update();
+          };
+        }}
+        class="space-y-4 max-w-3xl"
+      >
+        <div class="space-y-4">
+          <div>
+            <h3 class="text-sm font-bold">Select Products for Hero Slider</h3>
+            <p class="text-xs text-[var(--text-muted)] mt-1">Check the products you want to feature in the homepage animated hero slider.</p>
+          </div>
+
+          <div class="grid grid-cols-2 md:grid-cols-3 gap-4 border border-gray-100 dark:border-gray-800 p-4 rounded-xl max-h-96 overflow-y-auto">
+            {#each allProducts as product}
+              <label class="flex items-start gap-3 p-3 rounded-lg border hover:bg-gray-50 dark:hover:bg-gray-900 cursor-pointer {selectedHeroProductIds.includes(product.id) ? 'border-burgundy-500 bg-burgundy-50/30 dark:border-gold-500 dark:bg-gold-900/10' : 'border-gray-100 dark:border-gray-800'}">
+                <input
+                  type="checkbox"
+                  class="mt-1 h-4 w-4 rounded border-gray-300 text-burgundy-700 focus:ring-burgundy-700"
+                  checked={selectedHeroProductIds.includes(product.id)}
+                  onchange={(e) => {
+                    const checked = e.currentTarget.checked;
+                    if (checked) {
+                      selectedHeroProductIds = [...selectedHeroProductIds, product.id];
+                    } else {
+                      selectedHeroProductIds = selectedHeroProductIds.filter((id: string) => id !== product.id);
+                    }
+                  }}
+                />
+                <div class="flex flex-col gap-1 overflow-hidden">
+                  {#if product.image_url}
+                    <img src={product.image_url} alt={product.name} class="h-10 w-10 object-cover rounded-md" />
+                  {/if}
+                  <span class="text-xs font-semibold truncate">{product.name}</span>
+                  <span class="text-[10px] text-gray-500">{product.brand}</span>
+                </div>
+              </label>
+            {/each}
+          </div>
+
+          <!-- Hidden input to send array -->
+          <input type="hidden" name="product_ids" value={JSON.stringify(selectedHeroProductIds)} />
+        </div>
+
+        <div class="pt-4">
+          <Button type="submit" disabled={loading} class="bg-burgundy-700 hover:bg-burgundy-800 text-white font-semibold">
+            {loading ? 'Saving Slider Config...' : 'Save Hero Slider'}
           </Button>
         </div>
       </form>

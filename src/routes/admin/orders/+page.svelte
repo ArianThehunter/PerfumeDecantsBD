@@ -11,7 +11,7 @@
 
   // Filter orders by search query
   const filteredOrders = $derived(
-    orders.filter((order) => {
+    orders.filter((order: any) => {
       const query = searchQuery.toLowerCase();
       const orderNum = order.order_number.toLowerCase();
       const customerName = (order.profiles?.full_name || '').toLowerCase();

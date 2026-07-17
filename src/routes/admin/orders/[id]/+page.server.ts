@@ -7,7 +7,7 @@ export const load: PageServerLoad = async ({ params, locals }) => {
   // Fetch order details
   const { data: order, error: orderErr } = await supabase
     .from('orders')
-    .select('*, profiles(full_name, email, phone)')
+    .select('*')
     .eq('id', params.id)
     .single();
 

@@ -220,7 +220,7 @@ export interface Database {
       orders: {
         Row: {
           id: string;
-          user_id: string;
+          user_id: string | null;
           order_number: string;
           status: OrderStatus;
           subtotal: number;
@@ -234,7 +234,7 @@ export interface Database {
         };
         Insert: {
           id?: string;
-          user_id: string;
+          user_id?: string | null;
           order_number?: string;
           status?: OrderStatus;
           subtotal: number;
@@ -250,6 +250,25 @@ export interface Database {
           status?: OrderStatus;
           shipping_cost?: number;
           notes?: string | null;
+          updated_at?: string;
+        };
+      };
+      settings: {
+        Row: {
+          key: string;
+          value: Json;
+          created_at: string;
+          updated_at: string;
+        };
+        Insert: {
+          key: string;
+          value: Json;
+          created_at?: string;
+          updated_at?: string;
+        };
+        Update: {
+          key?: string;
+          value?: Json;
           updated_at?: string;
         };
       };
@@ -285,14 +304,21 @@ export interface Database {
         };
       };
     };
-    Views: Record<string, never>;
-    Functions: Record<string, never>;
+    Views: {
+      [_ in never]: never;
+    };
+    Functions: {
+      [_ in never]: never;
+    };
     Enums: {
       order_status: OrderStatus;
       payment_method: PaymentMethod;
       product_status: ProductStatus;
       user_role: UserRole;
       gender: Gender;
+    };
+    CompositeTypes: {
+      [_ in never]: never;
     };
   };
 }

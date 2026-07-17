@@ -5,7 +5,7 @@ export const load: PageServerLoad = async ({ locals }) => {
 
   const { data: orders } = await supabase
     .from('orders')
-    .select('*, profiles(full_name, phone)')
+    .select('*')
     .order('created_at', { ascending: false });
 
   return {

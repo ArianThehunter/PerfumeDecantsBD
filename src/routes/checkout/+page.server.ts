@@ -2,7 +2,7 @@ import { fail, redirect } from '@sveltejs/kit';
 import type { PageServerLoad, Actions } from './$types';
 
 export const load: PageServerLoad = async ({ locals }) => {
-  const supabase = locals.supabase;
+  const supabase = locals.supabase as any;
   const user = locals.user;
 
   if (!user) {
@@ -34,7 +34,7 @@ export const load: PageServerLoad = async ({ locals }) => {
 
 export const actions: Actions = {
   placeOrder: async ({ request, locals }) => {
-    const supabase = locals.supabase;
+    const supabase = locals.supabase as any;
     const user = locals.user;
 
     const formData = await request.formData();

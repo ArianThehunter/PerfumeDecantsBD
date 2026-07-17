@@ -2,27 +2,33 @@ import { fail } from '@sveltejs/kit';
 import type { PageServerLoad, Actions } from './$types';
 
 export const load: PageServerLoad = async ({ locals }) => {
-  const supabase = locals.supabase;
+  const supabase = locals.supabase as any;
 
   const { data: settingsData } = await supabase
     .from('settings')
     .select('*');
 
+  const { data: products } = await supabase
+    .from('products')
+    .select('id, name, brand, image_url')
+    .eq('status', 'active');
+
   const settings: Record<string, any> = {};
   if (settingsData) {
-    settingsData.forEach((row) => {
+    settingsData.forEach((row: any) => {
       settings[row.key] = row.value;
     });
   }
 
   return {
-    settings
+    settings,
+    products: products || []
   };
 };
 
 export const actions: Actions = {
   updateFooter: async ({ request, locals }) => {
-    const supabase = locals.supabase;
+    const supabase = locals.supabase as any;
     const formData = await request.formData();
 
     const payload = {
@@ -51,7 +57,7 @@ export const actions: Actions = {
   },
 
   updateAbout: async ({ request, locals }) => {
-    const supabase = locals.supabase;
+    const supabase = locals.supabase as any;
     const formData = await request.formData();
 
     const payload = {
@@ -78,7 +84,7 @@ export const actions: Actions = {
   },
 
   updateContact: async ({ request, locals }) => {
-    const supabase = locals.supabase;
+    const supabase = locals.supabase as any;
     const formData = await request.formData();
 
     const payload = {
@@ -105,7 +111,7 @@ export const actions: Actions = {
   },
 
   updateShop: async ({ request, locals }) => {
-    const supabase = locals.supabase;
+    const supabase = locals.supabase as any;
     const formData = await request.formData();
 
     const payload = {
@@ -120,6 +126,36 @@ export const actions: Actions = {
         updated_at: new Date().toISOString()
       })
       .eq('key', 'shop_page');
+
+    if (error) return fail(500, { message: error.message });
+    return { success: true };
+  },
+
+  updateHeroSlides: async ({ request, locals }) => {
+    const supabase = locals.supabase as any;
+    const formData = await request.formData();
+    
+    // Parse the JSON array string from the form
+    const productIdsStr = formData.get('product_ids') as string;
+    let productIds: string[] = [];
+    try {
+      productIds = JSON.parse(productIdsStr || '[]');
+    } catch (e) {
+      productIds = [];
+    }
+
+    const payload = {
+      product_ids: productIds
+    };
+
+    // Use upsert or update if we know it exists. The seeder should have inserted it, but let's upsert just in case.
+    const { error } = await supabase
+      .from('settings')
+      .upsert({
+        key: 'hero_slides',
+        value: payload,
+        updated_at: new Date().toISOString()
+      }, { onConflict: 'key' });
 
     if (error) return fail(500, { message: error.message });
     return { success: true };

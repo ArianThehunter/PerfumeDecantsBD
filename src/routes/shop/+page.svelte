@@ -1,7 +1,7 @@
 <script lang="ts">
   import { page } from '$app/state';
   import { goto } from '$app/navigation';
-  import { Star, SlidersHorizontal, Search, X, ChevronDown, ChevronLeft, ChevronRight, ShoppingBag } from '@lucide/svelte';
+  import { Star, SlidersHorizontal, Search, X, ChevronDown, ChevronLeft, ChevronRight, ShoppingBag, Plus, Minus } from '@lucide/svelte';
   import { Button } from '$lib/components/ui/button';
   import { Input } from '$lib/components/ui/input';
   import { cart } from '$lib/stores/cart.svelte';
@@ -10,6 +10,39 @@
   import type { PageData } from './$types';
 
   let { data } = $props<{ data: PageData }>();
+
+  function getDefaultSize(product: any) {
+    if (product.sizes && Array.isArray(product.sizes) && product.sizes.length > 0) {
+      return product.sizes[0];
+    }
+    return null;
+  }
+
+  function getCartItem(product: any) {
+    const sizeObj = getDefaultSize(product);
+    const sizeLabel = sizeObj ? sizeObj.label : null;
+    return cart.items.find(
+      (item) => item.product_id === product.id && item.size === sizeLabel
+    );
+  }
+
+  function handleDecrement(e: MouseEvent, product: any) {
+    e.preventDefault();
+    e.stopPropagation();
+    const item = getCartItem(product);
+    if (item) {
+      cart.updateQuantity(product.id, item.size, item.quantity - 1);
+    }
+  }
+
+  function handleIncrement(e: MouseEvent, product: any) {
+    e.preventDefault();
+    e.stopPropagation();
+    const item = getCartItem(product);
+    if (item) {
+      cart.updateQuantity(product.id, item.size, item.quantity + 1);
+    }
+  }
 
   // Filter state (runes)
   let searchInput = $state('');
@@ -173,7 +206,7 @@
         {/if}
         {#if filters.category}
           <span class="inline-flex items-center gap-1 rounded-full bg-burgundy-50 px-3 py-1 text-xs text-burgundy-800 dark:bg-burgundy-950 dark:text-gold-400">
-            {categories.find(c => c.slug === filters.category)?.name || filters.category}
+            {categories.find((c: any) => c.slug === filters.category)?.name || filters.category}
             <button onclick={() => updateFilters({ category: null })}><X class="h-3 w-3" /></button>
           </span>
         {/if}
@@ -274,7 +307,7 @@
                   id="min-price"
                   type="number"
                   value={filters.minPrice}
-                  onchange={(e) => updateFilters({ min_price: (e.target as HTMLInputElement).value })}
+                  onchange={(e: any) => updateFilters({ min_price: (e.target as HTMLInputElement).value })}
                 />
               </div>
               <div class="flex-1">
@@ -283,7 +316,7 @@
                   id="max-price"
                   type="number"
                   value={filters.maxPrice}
-                  onchange={(e) => updateFilters({ max_price: (e.target as HTMLInputElement).value })}
+                  onchange={(e: any) => updateFilters({ max_price: (e.target as HTMLInputElement).value })}
                 />
               </div>
             </div>
@@ -306,6 +339,7 @@
               {@const primaryImage = product.product_images?.find((img: any) => img.is_primary)?.url 
                 || product.product_images?.[0]?.url 
                 || 'https://images.unsplash.com/photo-1541643600914-78b084683601?w=400'}
+              {@const cartItem = getCartItem(product)}
               <a href="/product/{product.slug}" class="group card-premium flex flex-col justify-between overflow-hidden">
                 <div>
                   <div class="relative aspect-[4/5] overflow-hidden bg-gray-50 dark:bg-gray-900">
@@ -376,10 +410,38 @@
                       {/if}
                       <span class="block text-[10px] text-gray-500">From decant size</span>
                     </div>
-
-                    <span class="text-xs font-medium {product.stock_quantity > 0 ? 'text-green-600' : 'text-red-500'}">
-                      {product.stock_quantity > 0 ? 'In Stock' : 'Out of Stock'}
-                    </span>
+                    <div>
+                      <span class="text-xs font-medium {product.stock_quantity > 0 ? 'text-green-600' : 'text-red-500'} block text-right">
+                        {product.stock_quantity > 0 ? 'In Stock' : 'Out of Stock'}
+                      </span>
+                      {#if cartItem}
+                        <div class="mt-2 flex items-center justify-between border border-burgundy-200 dark:border-gold-800 rounded-lg overflow-hidden bg-[var(--bg-primary)] h-8 w-24 ml-auto">
+                          <button
+                            class="flex h-full w-8 items-center justify-center hover:bg-gray-150 dark:hover:bg-gray-800 text-burgundy-700 dark:text-gold-400 font-bold"
+                            onclick={(e) => handleDecrement(e, product)}
+                          >
+                            <Minus class="h-3 w-3" />
+                          </button>
+                          <span class="text-xs font-semibold text-gray-800 dark:text-gray-200">{cartItem.quantity}</span>
+                          <button
+                            class="flex h-full w-8 items-center justify-center hover:bg-gray-150 dark:hover:bg-gray-800 text-burgundy-700 dark:text-gold-400 font-bold"
+                            onclick={(e) => handleIncrement(e, product)}
+                            disabled={cartItem.quantity >= product.stock_quantity}
+                          >
+                            <Plus class="h-3 w-3" />
+                          </button>
+                        </div>
+                      {:else}
+                        <button
+                          class="mt-2 flex items-center justify-center gap-1.5 rounded-lg bg-burgundy-50 px-3 py-1.5 text-xs font-semibold text-burgundy-700 hover:bg-burgundy-100 transition-colors w-full sm:w-auto ml-auto animate-fade-in"
+                          onclick={(e) => handleAddToCart(e, product)}
+                          disabled={product.stock_quantity <= 0}
+                        >
+                          <ShoppingBag class="h-3.5 w-3.5" />
+                          Add
+                        </button>
+                      {/if}
+                    </div>
                   </div>
                 </div>
               </a>

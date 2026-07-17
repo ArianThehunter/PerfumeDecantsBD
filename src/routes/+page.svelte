@@ -1,13 +1,97 @@
 <script lang="ts">
-  import { ArrowRight, Star, Shield, Truck, Award, Sparkles, Quote } from '@lucide/svelte';
+  import { ArrowRight, Star, Shield, Truck, Award, Sparkles, Quote, Plus, Minus, ShoppingBag } from '@lucide/svelte';
   import { Button } from '$lib/components/ui/button';
+  import { cart } from '$lib/stores/cart.svelte';
+  import { toast } from 'svelte-sonner';
   import type { PageData } from './$types';
 
   let { data } = $props<{ data: PageData }>();
 
+  function getDefaultSize(product: any) {
+    if (product.sizes && Array.isArray(product.sizes) && product.sizes.length > 0) {
+      return product.sizes[0];
+    }
+    return null;
+  }
+
+  function getCartItem(product: any) {
+    const sizeObj = getDefaultSize(product);
+    const sizeLabel = sizeObj ? sizeObj.label : null;
+    return cart.items.find(
+      (item) => item.product_id === product.id && item.size === sizeLabel
+    );
+  }
+
+  function handleDecrement(e: MouseEvent, product: any) {
+    e.preventDefault();
+    e.stopPropagation();
+    const item = getCartItem(product);
+    if (item) {
+      cart.updateQuantity(product.id, item.size, item.quantity - 1);
+    }
+  }
+
+  function handleIncrement(e: MouseEvent, product: any) {
+    e.preventDefault();
+    e.stopPropagation();
+    const item = getCartItem(product);
+    if (item) {
+      cart.updateQuantity(product.id, item.size, item.quantity + 1);
+    }
+  }
+
+  function handleAddToCart(e: MouseEvent, product: any) {
+    e.preventDefault();
+    e.stopPropagation();
+
+    let sizeLabel = null;
+    let sizePrice = product.price;
+
+    if (product.sizes && Array.isArray(product.sizes) && product.sizes.length > 0) {
+      const firstSize = product.sizes[0];
+      sizeLabel = firstSize.label;
+      sizePrice = firstSize.price;
+    }
+
+    const primaryImage = product.product_images?.find((img: any) => img.is_primary)?.url 
+      || product.product_images?.[0]?.url 
+      || 'https://images.unsplash.com/photo-1541643600914-78b084683601?w=400';
+
+    cart.addItem({
+      product_id: product.id,
+      product_name: product.name,
+      product_image: primaryImage,
+      product_slug: product.slug,
+      brand: product.brand,
+      size: sizeLabel,
+      quantity: 1,
+      unit_price: sizePrice,
+      max_stock: product.stock_quantity
+    });
+
+    toast.success(`${product.name} added to cart`, {
+      action: {
+        label: 'View Cart',
+        onClick: () => cart.openCart()
+      }
+    });
+  }
+
   const featuredProducts = $derived(data.featuredProducts);
   const bestSellers = $derived(data.bestSellers);
   const categories = $derived(data.categories);
+  const heroProducts = $derived(data.heroProducts || []);
+
+  let currentSlide = $state(0);
+
+  $effect(() => {
+    if (heroProducts.length > 1) {
+      const interval = setInterval(() => {
+        currentSlide = (currentSlide + 1) % heroProducts.length;
+      }, 5000);
+      return () => clearInterval(interval);
+    }
+  });
 
   const testimonials = [
     { name: 'Ariana K.', text: 'Absolutely authentic fragrances! The decants are perfect for trying luxury scents before committing to a full bottle.', rating: 5 },
@@ -33,70 +117,114 @@
 
 <!-- Hero Section -->
 <section class="relative min-h-[90vh] overflow-hidden bg-burgundy-950 flex items-center">
-  <!-- Background Pattern -->
-  <div class="absolute inset-0 opacity-10">
-    <div class="absolute inset-0" style="background-image: radial-gradient(circle at 25% 25%, rgba(212, 168, 85, 0.3) 0%, transparent 50%), radial-gradient(circle at 75% 75%, rgba(122, 27, 62, 0.3) 0%, transparent 50%)"></div>
-  </div>
-
-  <!-- Cover Image Overlay -->
-  <div class="absolute inset-0">
-    <img src="/cover.png" alt="" class="h-full w-full object-cover opacity-20" />
-    <div class="absolute inset-0 bg-gradient-to-r from-burgundy-950 via-burgundy-950/90 to-burgundy-950/70"></div>
-  </div>
-
-  <div class="container-luxury relative z-10 py-20">
-    <div class="mx-auto max-w-3xl text-center">
-      <div class="animate-fade-in">
-        <span class="inline-block rounded-full border border-gold-500/30 bg-gold-500/10 px-4 py-1.5 text-xs font-medium uppercase tracking-widest text-gold-400">
-          Premium Fragrance Decants
-        </span>
-      </div>
-
-      <h1 class="mt-6 font-heading text-4xl font-bold leading-tight text-white sm:text-5xl md:text-6xl lg:text-7xl animate-slide-up" style="animation-delay: 0.1s; opacity: 0;">
-        Discover Your
-        <span class="text-gradient bg-gradient-to-r from-gold-400 to-gold-600 bg-clip-text text-transparent">
-          Signature Scent
-        </span>
-      </h1>
-
-      <p class="mt-6 text-base leading-relaxed text-cream-300/70 sm:text-lg animate-slide-up" style="animation-delay: 0.2s; opacity: 0;">
-        Experience the world's finest luxury perfumes without the full-bottle commitment.
-        Authentic decants, expertly curated, delivered to your doorstep in Bangladesh.
-      </p>
-
-      <div class="mt-10 flex flex-col gap-4 sm:flex-row sm:justify-center animate-slide-up" style="animation-delay: 0.3s; opacity: 0;">
-        <a
-          href="/shop"
-          class="btn-press inline-flex items-center justify-center gap-2 rounded-xl bg-gold-500 px-8 py-3.5 text-sm font-semibold text-burgundy-950 transition-all hover:bg-gold-400 hover:shadow-lg hover:shadow-gold-500/25"
-        >
-          Explore Collection
-          <ArrowRight class="h-4 w-4" />
-        </a>
-        <a
-          href="/about"
-          class="btn-press inline-flex items-center justify-center gap-2 rounded-xl border border-cream-300/20 px-8 py-3.5 text-sm font-medium text-cream-200 transition-all hover:bg-white/5"
-        >
-          Our Story
-        </a>
-      </div>
-
-      <!-- Stats -->
-      <div class="mt-16 grid grid-cols-3 gap-8 border-t border-cream-300/10 pt-10 animate-slide-up" style="animation-delay: 0.4s; opacity: 0;">
-        <div>
-          <p class="font-heading text-2xl font-bold text-gold-400 sm:text-3xl">500+</p>
-          <p class="mt-1 text-xs text-cream-300/50 sm:text-sm">Happy Customers</p>
+  {#if heroProducts.length > 0}
+    <div class="absolute inset-0 transition-opacity duration-700">
+      {#each heroProducts as product, i}
+        {@const productImg = product.product_images?.[0]?.url || 'https://images.unsplash.com/photo-1541643600914-78b084683601?w=1920'}
+        <div class="absolute inset-0 transition-opacity duration-1000 {i === currentSlide ? 'opacity-100 z-10' : 'opacity-0 z-0'}">
+          <img src={productImg} alt={product.name} class="h-full w-full object-cover opacity-30" />
+          <div class="absolute inset-0 bg-gradient-to-r from-burgundy-950 via-burgundy-950/90 to-burgundy-950/70"></div>
+          
+          <div class="container-luxury absolute inset-0 flex items-center">
+            <div class="max-w-3xl">
+              <span class="inline-block rounded-full border border-gold-500/30 bg-gold-500/10 px-4 py-1.5 text-xs font-medium uppercase tracking-widest text-gold-400">
+                Featured Product
+              </span>
+              <h1 class="mt-6 font-heading text-4xl font-bold leading-tight text-white sm:text-5xl md:text-6xl">
+                {product.name}
+              </h1>
+              <p class="mt-6 text-base leading-relaxed text-cream-300/70 sm:text-lg">
+                By {product.brand}. Available in premium decant sizes.
+              </p>
+              <div class="mt-10 flex gap-4">
+                <a
+                  href="/product/{product.slug}"
+                  class="btn-press inline-flex items-center justify-center gap-2 rounded-xl bg-gold-500 px-8 py-3.5 text-sm font-semibold text-burgundy-950 transition-all hover:bg-gold-400 hover:shadow-lg hover:shadow-gold-500/25"
+                >
+                  Shop Now
+                  <ArrowRight class="h-4 w-4" />
+                </a>
+              </div>
+            </div>
+          </div>
         </div>
-        <div>
-          <p class="font-heading text-2xl font-bold text-gold-400 sm:text-3xl">50+</p>
-          <p class="mt-1 text-xs text-cream-300/50 sm:text-sm">Premium Brands</p>
+      {/each}
+
+      <!-- Slider Controls -->
+      <div class="absolute bottom-8 left-1/2 -translate-x-1/2 flex gap-2 z-20">
+        {#each heroProducts as _, i}
+          <button
+            class="h-2 rounded-full transition-all {i === currentSlide ? 'w-8 bg-gold-500' : 'w-2 bg-cream-300/30'}"
+            onclick={() => currentSlide = i}
+            aria-label="Go to slide {i + 1}"
+          ></button>
+        {/each}
+      </div>
+    </div>
+  {:else}
+    <!-- Fallback Static Hero -->
+    <div class="absolute inset-0 opacity-10">
+      <div class="absolute inset-0" style="background-image: radial-gradient(circle at 25% 25%, rgba(212, 168, 85, 0.3) 0%, transparent 50%), radial-gradient(circle at 75% 75%, rgba(122, 27, 62, 0.3) 0%, transparent 50%)"></div>
+    </div>
+    <div class="absolute inset-0">
+      <img src="/cover.png" alt="" class="h-full w-full object-cover opacity-20" />
+      <div class="absolute inset-0 bg-gradient-to-r from-burgundy-950 via-burgundy-950/90 to-burgundy-950/70"></div>
+    </div>
+
+    <div class="container-luxury relative z-10 py-20">
+      <div class="mx-auto max-w-3xl text-center">
+        <div class="animate-fade-in">
+          <span class="inline-block rounded-full border border-gold-500/30 bg-gold-500/10 px-4 py-1.5 text-xs font-medium uppercase tracking-widest text-gold-400">
+            Premium Fragrance Decants
+          </span>
         </div>
-        <div>
-          <p class="font-heading text-2xl font-bold text-gold-400 sm:text-3xl">100%</p>
-          <p class="mt-1 text-xs text-cream-300/50 sm:text-sm">Authentic</p>
+
+        <h1 class="mt-6 font-heading text-4xl font-bold leading-tight text-white sm:text-5xl md:text-6xl lg:text-7xl animate-slide-up" style="animation-delay: 0.1s; opacity: 0;">
+          Discover Your
+          <span class="text-gradient bg-gradient-to-r from-gold-400 to-gold-600 bg-clip-text text-transparent">
+            Signature Scent
+          </span>
+        </h1>
+
+        <p class="mt-6 text-base leading-relaxed text-cream-300/70 sm:text-lg animate-slide-up" style="animation-delay: 0.2s; opacity: 0;">
+          Experience the world's finest luxury perfumes without the full-bottle commitment.
+          Authentic decants, expertly curated, delivered to your doorstep in Bangladesh.
+        </p>
+
+        <div class="mt-10 flex flex-col gap-4 sm:flex-row sm:justify-center animate-slide-up" style="animation-delay: 0.3s; opacity: 0;">
+          <a
+            href="/shop"
+            class="btn-press inline-flex items-center justify-center gap-2 rounded-xl bg-gold-500 px-8 py-3.5 text-sm font-semibold text-burgundy-950 transition-all hover:bg-gold-400 hover:shadow-lg hover:shadow-gold-500/25"
+          >
+            Explore Collection
+            <ArrowRight class="h-4 w-4" />
+          </a>
+          <a
+            href="/about"
+            class="btn-press inline-flex items-center justify-center gap-2 rounded-xl border border-cream-300/20 px-8 py-3.5 text-sm font-medium text-cream-200 transition-all hover:bg-white/5"
+          >
+            Our Story
+          </a>
+        </div>
+
+        <!-- Stats -->
+        <div class="mt-16 grid grid-cols-3 gap-8 border-t border-cream-300/10 pt-10 animate-slide-up" style="animation-delay: 0.4s; opacity: 0;">
+          <div>
+            <p class="font-heading text-2xl font-bold text-gold-400 sm:text-3xl">500+</p>
+            <p class="mt-1 text-xs text-cream-300/50 sm:text-sm">Happy Customers</p>
+          </div>
+          <div>
+            <p class="font-heading text-2xl font-bold text-gold-400 sm:text-3xl">50+</p>
+            <p class="mt-1 text-xs text-cream-300/50 sm:text-sm">Premium Brands</p>
+          </div>
+          <div>
+            <p class="font-heading text-2xl font-bold text-gold-400 sm:text-3xl">100%</p>
+            <p class="mt-1 text-xs text-cream-300/50 sm:text-sm">Authentic</p>
+          </div>
         </div>
       </div>
     </div>
-  </div>
+  {/if}
 
   <!-- Scroll Indicator -->
   <div class="absolute bottom-8 left-1/2 -translate-x-1/2 animate-float">
@@ -120,6 +248,7 @@
     <div class="mt-12 grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
       {#each featuredProducts as product}
         {@const productImg = product.product_images?.[0]?.url || 'https://images.unsplash.com/photo-1541643600914-78b084683601?w=400'}
+        {@const cartItem = getCartItem(product)}
         <a href="/product/{product.slug}" class="group card-premium overflow-hidden">
           <div class="relative aspect-[4/5] overflow-hidden bg-gray-100 dark:bg-gray-900">
             <img
@@ -143,13 +272,45 @@
               {/each}
               <span class="ml-1 text-xs text-[var(--text-muted)]">{product.rating}</span>
             </div>
-            <div class="mt-2 flex items-center gap-2">
-              {#if product.discount_price}
-                <span class="font-heading text-lg font-bold text-burgundy-700 dark:text-gold-400">{formatPrice(product.discount_price)}</span>
-                <span class="text-sm text-gray-400 line-through">{formatPrice(product.price)}</span>
-              {:else}
-                <span class="font-heading text-lg font-bold text-burgundy-700 dark:text-gold-400">{formatPrice(product.price)}</span>
-              {/if}
+            <div class="mt-2 flex items-center justify-between">
+              <div>
+                {#if product.discount_price}
+                  <span class="font-heading text-lg font-bold text-burgundy-700 dark:text-gold-400 block">{formatPrice(product.discount_price)}</span>
+                  <span class="text-xs text-gray-400 line-through block">{formatPrice(product.price)}</span>
+                {:else}
+                  <span class="font-heading text-lg font-bold text-burgundy-700 dark:text-gold-400 block">{formatPrice(product.price)}</span>
+                {/if}
+              </div>
+
+              <div>
+                {#if cartItem}
+                  <div class="flex items-center justify-between border border-burgundy-200 dark:border-gold-800 rounded-lg overflow-hidden bg-[var(--bg-primary)] h-8 w-24 ml-auto">
+                    <button
+                      class="flex h-full w-8 items-center justify-center hover:bg-gray-150 dark:hover:bg-gray-800 text-burgundy-700 dark:text-gold-400 font-bold"
+                      onclick={(e) => handleDecrement(e, product)}
+                    >
+                      <Minus class="h-3 w-3" />
+                    </button>
+                    <span class="text-xs font-semibold text-gray-800 dark:text-gray-200">{cartItem.quantity}</span>
+                    <button
+                      class="flex h-full w-8 items-center justify-center hover:bg-gray-150 dark:hover:bg-gray-800 text-burgundy-700 dark:text-gold-400 font-bold"
+                      onclick={(e) => handleIncrement(e, product)}
+                      disabled={cartItem.quantity >= product.stock_quantity}
+                    >
+                      <Plus class="h-3 w-3" />
+                    </button>
+                  </div>
+                {:else}
+                  <button
+                    class="flex items-center justify-center gap-1.5 rounded-lg bg-burgundy-50 px-3 py-1.5 text-xs font-semibold text-burgundy-700 hover:bg-burgundy-100 transition-colors ml-auto animate-fade-in"
+                    onclick={(e) => handleAddToCart(e, product)}
+                    disabled={product.stock_quantity <= 0}
+                  >
+                    <ShoppingBag class="h-3.5 w-3.5" />
+                    Add
+                  </button>
+                {/if}
+              </div>
             </div>
           </div>
         </a>
@@ -213,6 +374,7 @@
     <div class="mt-12 grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
       {#each bestSellers as product}
         {@const productImg = product.product_images?.[0]?.url || 'https://images.unsplash.com/photo-1541643600914-78b084683601?w=400'}
+        {@const cartItem = getCartItem(product)}
         <a href="/product/{product.slug}" class="group card-premium overflow-hidden">
           <div class="relative aspect-[4/5] overflow-hidden bg-gray-100 dark:bg-gray-900">
             <img
@@ -234,7 +396,41 @@
               {/each}
               <span class="ml-1 text-xs text-[var(--text-muted)]">{product.rating}</span>
             </div>
-            <p class="mt-2 font-heading text-lg font-bold text-burgundy-700 dark:text-gold-400">{formatPrice(product.price)}</p>
+            <div class="mt-2 flex items-center justify-between">
+              <div>
+                <span class="font-heading text-lg font-bold text-burgundy-700 dark:text-gold-400 block">{formatPrice(product.price)}</span>
+              </div>
+
+              <div>
+                {#if cartItem}
+                  <div class="flex items-center justify-between border border-burgundy-200 dark:border-gold-800 rounded-lg overflow-hidden bg-[var(--bg-primary)] h-8 w-24 ml-auto">
+                    <button
+                      class="flex h-full w-8 items-center justify-center hover:bg-gray-150 dark:hover:bg-gray-800 text-burgundy-700 dark:text-gold-400 font-bold"
+                      onclick={(e) => handleDecrement(e, product)}
+                    >
+                      <Minus class="h-3 w-3" />
+                    </button>
+                    <span class="text-xs font-semibold text-gray-800 dark:text-gray-200">{cartItem.quantity}</span>
+                    <button
+                      class="flex h-full w-8 items-center justify-center hover:bg-gray-150 dark:hover:bg-gray-800 text-burgundy-700 dark:text-gold-400 font-bold"
+                      onclick={(e) => handleIncrement(e, product)}
+                      disabled={cartItem.quantity >= product.stock_quantity}
+                    >
+                      <Plus class="h-3 w-3" />
+                    </button>
+                  </div>
+                {:else}
+                  <button
+                    class="flex items-center justify-center gap-1.5 rounded-lg bg-burgundy-50 px-3 py-1.5 text-xs font-semibold text-burgundy-700 hover:bg-burgundy-100 transition-colors ml-auto animate-fade-in"
+                    onclick={(e) => handleAddToCart(e, product)}
+                    disabled={product.stock_quantity <= 0}
+                  >
+                    <ShoppingBag class="h-3.5 w-3.5" />
+                    Add
+                  </button>
+                {/if}
+              </div>
+            </div>
           </div>
         </a>
       {/each}
