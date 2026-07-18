@@ -31,6 +31,8 @@
   let city = $state('');
   let district = $state('');
   let postalCode = $state('');
+  let guestEmailValue = $state('');
+  let checkoutAsGuest = $state(false);
 
   // Auto-resolve current shipping details for dynamic fee calculation
   let activeCity = $derived.by(() => {
@@ -97,9 +99,55 @@
       <h1 class="font-heading text-3xl font-bold">Secure Checkout</h1>
     </div>
 
-    <div class="grid gap-8 lg:grid-cols-[1fr_380px]">
-      <!-- Left: Checkout Form -->
-      <div class="space-y-6">
+    {#if !profile && !checkoutAsGuest}
+      <!-- Option Selector -->
+      <div class="max-w-2xl mx-auto space-y-8 my-8 md:my-16 animate-scale-in">
+        <div class="text-center space-y-2">
+          <h2 class="font-heading text-3xl font-bold text-burgundy-950 dark:text-cream-200">How would you like to checkout?</h2>
+          <p class="text-xs text-[var(--text-muted)]">Choose an option below to proceed with your order placement.</p>
+        </div>
+
+        <div class="grid gap-6 md:grid-cols-2">
+          <!-- Option 1: Guest Checkout -->
+          <div class="card-premium p-6 flex flex-col justify-between items-center text-center space-y-4 bg-white dark:bg-gray-950 border border-gray-150 dark:border-gray-850">
+            <div class="space-y-2">
+              <h3 class="font-heading text-lg font-bold">Continue as Guest</h3>
+              <p class="text-xs text-[var(--text-secondary)] leading-relaxed">
+                Place your order quickly without creating an account. You can easily track your delivery status later.
+              </p>
+            </div>
+            <Button
+              type="button"
+              onclick={() => (checkoutAsGuest = true)}
+              class="w-full bg-burgundy-700 hover:bg-burgundy-800 text-white font-bold py-2.5 rounded-xl text-xs"
+            >
+              Checkout as Guest
+            </Button>
+          </div>
+
+          <!-- Option 2: Sign In -->
+          <div class="card-premium p-6 flex flex-col justify-between items-center text-center space-y-4 bg-white dark:bg-gray-950 border border-gray-150 dark:border-gray-850">
+            <div class="space-y-2">
+              <h3 class="font-heading text-lg font-bold">Sign in to Account</h3>
+              <p class="text-xs text-[var(--text-secondary)] leading-relaxed">
+                Access your saved addresses, track previous orders, and complete your purchase faster with saved details.
+              </p>
+            </div>
+            <a href="/auth/login?redirect=/checkout" class="w-full">
+              <Button
+                type="button"
+                class="w-full bg-gold-500 hover:bg-gold-600 text-burgundy-950 font-bold py-2.5 rounded-xl text-xs"
+              >
+                Sign In &rarr;
+              </Button>
+            </a>
+          </div>
+        </div>
+      </div>
+    {:else}
+      <div class="grid gap-8 lg:grid-cols-[1fr_380px]">
+        <!-- Left: Checkout Form -->
+        <div class="space-y-6">
         <form
           method="post"
           action="?/placeOrder"
@@ -145,8 +193,11 @@
               <div class="space-y-4 pt-2">
                 {#if !profile}
                   <div class="space-y-1">
-                    <label for="guestEmail" class="text-xs font-bold uppercase tracking-wider text-[var(--text-secondary)]">Email Address</label>
-                    <Input id="guestEmail" name="guestEmail" type="email" placeholder="yourname@example.com" required />
+                    <label for="guestEmail" class="text-xs font-bold uppercase tracking-wider text-[var(--text-secondary)]">Email Address <span class="text-red-500">*</span></label>
+                    <Input id="guestEmail" name="guestEmail" type="email" placeholder="yourname@example.com" required bind:value={guestEmailValue} />
+                    {#if guestEmailValue && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(guestEmailValue)}
+                      <p class="text-[10px] text-red-500 font-semibold">Please enter a valid email address.</p>
+                    {/if}
                   </div>
                 {/if}
 
@@ -390,5 +441,6 @@
         </div>
       </div>
     </div>
+  {/if}
   </div>
 </div>

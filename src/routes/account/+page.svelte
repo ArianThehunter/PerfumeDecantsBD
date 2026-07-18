@@ -27,7 +27,11 @@
 
   $effect(() => {
     if (form?.success) {
-      toast.success('Profile updated successfully');
+      if (form.claimedCount !== undefined) {
+        toast.success(`Successfully associated ${form.claimedCount} guest order(s) with your account!`);
+      } else {
+        toast.success('Profile updated successfully');
+      }
     } else if (form?.message) {
       toast.error(form.message);
     }
@@ -39,6 +43,31 @@
 </svelte:head>
 
 <div class="space-y-6">
+  {#if data.unclaimedCount > 0}
+    <div class="animate-scale-in rounded-xl border border-gold-300 bg-gold-50/15 p-5 dark:border-gold-800 dark:bg-gold-950/10 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+      <div class="space-y-1">
+        <h4 class="font-bold text-sm text-gold-700 dark:text-gold-400">Previous Orders Found</h4>
+        <p class="text-xs text-[var(--text-secondary)]">We found {data.unclaimedCount} guest order(s) placed with your email <strong>{page.data.user?.email}</strong>. Would you like to associate them with this account?</p>
+      </div>
+      <form
+        method="post"
+        action="?/claimGuestOrders"
+        use:enhance={() => {
+          loading = true;
+          return async ({ update }) => {
+            loading = false;
+            await update();
+          };
+        }}
+        class="shrink-0"
+      >
+        <Button type="submit" class="bg-gold-500 hover:bg-gold-600 text-burgundy-950 font-bold rounded-xl text-xs px-4 py-2">
+          Import Orders
+        </Button>
+      </form>
+    </div>
+  {/if}
+
   <div>
     <h2 class="font-heading text-2xl font-bold">Account Profile</h2>
     <p class="text-sm text-[var(--text-muted)]">Update your basic account credentials and contact details.</p>

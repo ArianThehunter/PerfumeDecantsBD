@@ -58,7 +58,18 @@
       </div>
     </div>
 
-    <div class="flex flex-col sm:flex-row gap-3 justify-center pt-4">
+    {#if !data.isAuthenticated}
+      <!-- Account creation encouragement -->
+      <div class="mt-6 rounded-xl border border-dashed border-gray-250 bg-gray-50/50 p-5 dark:border-gray-800 dark:bg-gray-900/30 text-xs text-[var(--text-secondary)] space-y-2 max-w-md mx-auto">
+        <p class="font-bold text-gray-900 dark:text-cream-200">Create an account to track future orders, save your addresses, and enjoy a faster checkout experience.</p>
+        <p class="text-[10px] text-[var(--text-muted)]">It's completely optional and takes less than a minute.</p>
+        <a href="/auth/register" class="inline-block text-xs font-bold text-burgundy-700 hover:text-burgundy-800 dark:text-gold-400 hover:underline mt-1">
+          Register Account Now &rarr;
+        </a>
+      </div>
+    {/if}
+
+    <div class="flex flex-col sm:flex-row gap-3 justify-center pt-6">
       {#if data.isAuthenticated}
         <a
           href="/account/orders/{order.id}"
@@ -68,12 +79,13 @@
           Track Order
         </a>
       {:else}
+        {@const shippingAddress = order.shipping_address as any}
         <a
-          href="/auth/register"
+          href="/track?orderId={order.order_number}&phone={shippingAddress?.phone || ''}"
           class="btn-press flex items-center justify-center gap-2 rounded-xl border border-gray-200 px-6 py-3 text-sm font-semibold transition-colors hover:bg-gray-50 dark:border-gray-800 dark:hover:bg-gray-900"
         >
           <ShoppingBag class="h-4 w-4" />
-          Create Account to Track
+          View Order Details
         </a>
       {/if}
       <a

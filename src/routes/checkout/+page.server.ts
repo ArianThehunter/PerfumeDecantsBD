@@ -104,7 +104,12 @@ export const actions: Actions = {
       // Validate email for guest checkouts
       const orderEmail = user ? user.email : guestEmail;
       if (!orderEmail) {
-        return fail(400, { message: 'Email address is required for checkout' });
+        return fail(400, { message: 'Email address is required for checkout.' });
+      }
+
+      const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+      if (!emailRegex.test(orderEmail)) {
+        return fail(400, { message: 'Please provide a valid email address.' });
       }
 
       // Mandatory validation checks

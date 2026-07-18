@@ -89,8 +89,15 @@
               <tr class="hover:bg-gray-50/50 dark:hover:bg-gray-900/50 transition-colors">
                 <td class="p-4 font-mono font-bold text-gray-900 dark:text-white text-sm">{order.order_number}</td>
                 <td class="p-4">
-                  <div class="font-bold text-gray-800 dark:text-gray-200">
-                    {addr?.full_name || order.profiles?.full_name || 'Guest'}
+                  <div class="flex items-center gap-2">
+                    <span class="font-bold text-gray-800 dark:text-gray-200">
+                      {addr?.full_name || order.profiles?.full_name || 'Guest'}
+                    </span>
+                    {#if !order.user_id}
+                      <span class="inline-flex items-center rounded-full bg-gray-150 px-2 py-0.5 text-[9px] font-bold text-gray-700 dark:bg-gray-800 dark:text-gray-300">
+                        Guest Order
+                      </span>
+                    {/if}
                   </div>
                   <div class="text-[10px] text-gray-500">{addr?.phone || order.profiles?.phone || ''}</div>
                 </td>

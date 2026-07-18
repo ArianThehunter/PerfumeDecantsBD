@@ -13,8 +13,14 @@ export const load: PageServerLoad = async ({ locals }) => {
     .eq('id', user.id)
     .single();
 
+  // Check for any unclaimed guest orders matching the email of the logged-in user
+  const { data: unclaimedCount } = await supabase.rpc('count_unclaimed_guest_orders', {
+    p_email: user.email
+  });
+
   return {
-    profile
+    profile,
+    unclaimedCount: unclaimedCount ? Number(unclaimedCount) : 0
   };
 };
 
@@ -51,5 +57,23 @@ export const actions: Actions = {
     }
 
     return { success: true };
+  },
+
+  claimGuestOrders: async ({ locals }) => {
+    const supabase = locals.supabase;
+    const user = locals.user;
+
+    if (!user || !user.email) return fail(401, { message: 'Unauthorized' });
+
+    const { data: claimedCount, error } = await supabase.rpc('claim_guest_orders', {
+      p_user_id: user.id,
+      p_email: user.email
+    });
+
+    if (error) {
+      return fail(500, { message: error.message || 'Failed to claim orders.' });
+    }
+
+    return { success: true, claimedCount };
   }
 };

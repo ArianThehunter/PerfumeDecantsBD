@@ -96,13 +96,6 @@ export const handle: Handle = async ({ event, resolve }) => {
     }
   }
 
-  // Protect checkout route
-  if (event.url.pathname.startsWith('/checkout') && !event.url.pathname.includes('/confirmation')) {
-    if (!user) {
-      throw redirect(303, '/auth/login?redirect=/checkout');
-    }
-  }
-
   return resolve(event, {
     filterSerializedResponseHeaders(name) {
       return name === 'content-range' || name === 'x-supabase-api-version';
