@@ -17,6 +17,24 @@
   let showEditModal = $state(false);
   let loading = $state(false);
 
+  // Add fields
+  let addName = $state('');
+  let addSlug = $state('');
+  let addSlugEdited = $state(false);
+
+  function slugify(text: string) {
+    return text
+      .toLowerCase()
+      .replace(/[^a-z0-9\s-]/g, '')
+      .replace(/\s+/g, '-');
+  }
+
+  $effect(() => {
+    if (!addSlugEdited) {
+      addSlug = slugify(addName);
+    }
+  });
+
   // Edit fields
   let editId = $state('');
   let editName = $state('');
@@ -40,6 +58,9 @@
       toast.success('Categories updated successfully');
       showAddModal = false;
       showEditModal = false;
+      addName = '';
+      addSlug = '';
+      addSlugEdited = false;
     } else if (form?.message) {
       toast.error(form.message);
     }
@@ -162,11 +183,11 @@
       <div class="grid grid-cols-2 gap-4">
         <div>
           <label for="name" class="text-xs font-bold uppercase tracking-wider text-[var(--text-secondary)]">Name</label>
-          <Input id="name" name="name" type="text" placeholder="Eau de Parfum" required />
+          <Input id="name" name="name" type="text" placeholder="Eau de Parfum" required bind:value={addName} />
         </div>
         <div>
           <label for="slug" class="text-xs font-bold uppercase tracking-wider text-[var(--text-secondary)]">Slug</label>
-          <Input id="slug" name="slug" type="text" placeholder="eau-de-parfum" required />
+          <Input id="slug" name="slug" type="text" placeholder="eau-de-parfum" required bind:value={addSlug} oninput={() => addSlugEdited = true} />
         </div>
       </div>
 

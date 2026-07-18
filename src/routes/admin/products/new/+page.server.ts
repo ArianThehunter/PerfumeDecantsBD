@@ -1,5 +1,6 @@
 import { fail, redirect } from '@sveltejs/kit';
 import type { PageServerLoad, Actions } from './$types';
+import { logger } from '$lib/services/logger';
 
 export const load: PageServerLoad = async ({ locals }) => {
   const supabase = locals.supabase;
@@ -146,6 +147,9 @@ export const actions: Actions = {
         display_order: 1
       });
     }
+
+    // Log product creation success
+    logger.info('Product created', { productId: newProduct.id, name, brand });
 
     throw redirect(303, '/admin/products');
   }

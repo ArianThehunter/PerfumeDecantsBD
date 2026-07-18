@@ -95,11 +95,21 @@ export const load: PageServerLoad = async ({ locals }) => {
     .order('created_at', { ascending: false })
     .limit(5);
 
-  // 10. Low Stock Products
+  // 10. Low Stock Products (Dynamic Configurable Threshold)
+  const { data: inventorySettings } = await supabase
+    .from('settings')
+    .select('value')
+    .eq('key', 'inventory_settings')
+    .single();
+
+  const threshold = inventorySettings?.value?.low_stock_threshold !== undefined
+    ? Number(inventorySettings.value.low_stock_threshold)
+    : 5;
+
   const { data: lowStockProducts } = await supabase
     .from('products')
     .select('*')
-    .lte('stock_quantity', 5)
+    .lte('stock_quantity', threshold)
     .order('stock_quantity', { ascending: true })
     .limit(5);
 

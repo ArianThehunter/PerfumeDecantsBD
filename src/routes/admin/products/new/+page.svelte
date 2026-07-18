@@ -18,6 +18,24 @@
   let sizePrice = $state(0);
   let sizesList = $state<{ label: string; price: number; ml: number }[]>([]);
 
+  // Automatic slug generation
+  let name = $state('');
+  let slug = $state('');
+  let slugEdited = $state(false);
+
+  function slugify(text: string) {
+    return text
+      .toLowerCase()
+      .replace(/[^a-z0-9\s-]/g, '')
+      .replace(/\s+/g, '-');
+  }
+
+  $effect(() => {
+    if (!slugEdited) {
+      slug = slugify(name);
+    }
+  });
+
   // Computed json string for form submit
   const sizesJson = $derived(sizesList.length > 0 ? JSON.stringify(sizesList) : '');
 
@@ -85,7 +103,7 @@
         <div class="grid gap-4 sm:grid-cols-2">
           <div class="space-y-1">
             <label for="name" class="text-xs font-bold uppercase tracking-wider text-[var(--text-secondary)]">Name</label>
-            <Input id="name" name="name" type="text" placeholder="Creed Aventus" required />
+            <Input id="name" name="name" type="text" placeholder="Creed Aventus" required bind:value={name} />
           </div>
           <div class="space-y-1">
             <label for="brand" class="text-xs font-bold uppercase tracking-wider text-[var(--text-secondary)]">Brand</label>
@@ -96,7 +114,7 @@
         <div class="grid gap-4 sm:grid-cols-2">
           <div class="space-y-1">
             <label for="slug" class="text-xs font-bold uppercase tracking-wider text-[var(--text-secondary)]">Slug</label>
-            <Input id="slug" name="slug" type="text" placeholder="creed-aventus" required />
+            <Input id="slug" name="slug" type="text" placeholder="creed-aventus" required bind:value={slug} oninput={() => slugEdited = true} />
           </div>
           <div class="space-y-1">
             <label for="categoryId" class="text-xs font-bold uppercase tracking-wider text-[var(--text-secondary)]">Category</label>

@@ -1,5 +1,6 @@
 import { error, fail } from '@sveltejs/kit';
 import type { PageServerLoad, Actions } from './$types';
+import { logger } from '$lib/services/logger';
 
 export const load: PageServerLoad = async ({ params, locals }) => {
   const supabase = locals.supabase as any;
@@ -82,8 +83,12 @@ export const actions: Actions = {
       .eq('id', params.id);
 
     if (updateErr) {
-      return fail(500, { message: updateErr.message || 'Failed to cancel order.' });
+      console.error('Failed to cancel order:', updateErr);
+      return fail(500, { message: 'An internal error occurred. Could not cancel order. Please try again.' });
     }
+
+    // Log order cancellation success
+    logger.info('Order cancelled by customer', { orderId: params.id }, user.id, user.email);
 
     return { success: true };
   }

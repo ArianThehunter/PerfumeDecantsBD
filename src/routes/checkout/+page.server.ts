@@ -1,5 +1,6 @@
 import { fail, redirect } from '@sveltejs/kit';
 import type { PageServerLoad, Actions } from './$types';
+import { logger } from '$lib/services/logger';
 
 export const load: PageServerLoad = async ({ locals }) => {
   const supabase = locals.supabase as any;
@@ -194,21 +195,15 @@ export const actions: Actions = {
         total_price: item.unit_price * item.quantity
       });
 
-      // Update product stock
-      const { data: currentProduct } = await supabase
-        .from('products')
-        .select('stock_quantity')
-        .eq('id', item.product_id)
-        .single();
-
-      if (currentProduct) {
-        const newStock = Math.max(0, currentProduct.stock_quantity - item.quantity);
-        await supabase
-          .from('products')
-          .update({ stock_quantity: newStock })
-          .eq('id', item.product_id);
-      }
     }
+
+    // Log order placement success
+    logger.info('Order placed successfully', {
+      orderId: order.id,
+      orderNumber: order.order_number,
+      total: total,
+      paymentMethod
+    }, user?.id || null, user?.email || (shippingAddress as any).email);
 
     cookies.set('placed_order_id', order.id, {
       path: '/',

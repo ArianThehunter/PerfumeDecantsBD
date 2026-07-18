@@ -1,5 +1,6 @@
 import { fail } from '@sveltejs/kit';
 import type { PageServerLoad, Actions } from './$types';
+import { logger } from '$lib/services/logger';
 
 export const load: PageServerLoad = async ({ parent }) => {
   const layoutData = await parent();
@@ -37,6 +38,9 @@ export const actions: Actions = {
       console.error('Failed to submit contact message:', error);
       return fail(500, { message: 'An internal error occurred. Could not submit your message at this time.' });
     }
+
+    // Log contact message submission success
+    logger.info('Contact form submitted', { name, email, subject });
 
     return { success: true };
   }

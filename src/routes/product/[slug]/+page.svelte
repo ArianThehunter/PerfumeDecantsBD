@@ -59,6 +59,11 @@
 
 <svelte:head>
   <title>{product.name} — {product.brand}</title>
+  <meta name="description" content={product.short_description || `Buy authentic ${product.name} perfume decant by ${product.brand} in Bangladesh. High quality atomizers, fast delivery.`} />
+  <meta property="og:title" content="{product.name} — {product.brand}" />
+  <meta property="og:description" content={product.short_description || `Buy authentic ${product.name} perfume decant by ${product.brand} in Bangladesh.`} />
+  <meta property="og:type" content="product" />
+  <meta property="og:image" content={activeImageUrl} />
 </svelte:head>
 
 <div class="bg-[var(--bg-primary)] py-8 lg:py-16">

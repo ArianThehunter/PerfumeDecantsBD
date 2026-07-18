@@ -1,5 +1,6 @@
 import { fail } from '@sveltejs/kit';
 import type { PageServerLoad, Actions } from './$types';
+import { logger } from '$lib/services/logger';
 
 export const load: PageServerLoad = async ({ params, locals }) => {
   const supabase = locals.supabase;
@@ -49,6 +50,9 @@ export const actions: Actions = {
       console.error('Failed to update order status:', error);
       return fail(500, { message: 'An internal error occurred while updating the status. Please try again.' });
     }
+
+    // Log status update success
+    logger.info(`Order status updated to ${status}`, { orderId: params.id, status });
 
     return { success: true };
   }
