@@ -77,26 +77,21 @@
   });
 
   $effect(() => {
-    if (form?.success && form.orderId) {
-      // Clear cart
-      cart.clearCart();
-      toast.success('Order placed successfully!');
-      goto(`/checkout/confirmation?id=${form.orderId}`);
-    } else if (form?.message) {
+    if (form?.message) {
       toast.error(form.message);
     }
   });
 </script>
 
 <svelte:head>
-  <title>Checkout — PerfumeDecantsBD</title>
+  <title>Checkout</title>
 </svelte:head>
 
 <div class="bg-[var(--bg-secondary)] py-10 lg:py-16 min-h-[85vh]">
   <div class="container-luxury">
     <!-- Header -->
     <div class="mb-8 flex items-center gap-3">
-      <a href="/cart" class="flex h-9 w-9 items-center justify-center rounded-full hover:bg-gray-200 transition-colors">
+      <a href="/cart" class="flex h-9 w-9 items-center justify-center rounded-full hover:bg-gray-200 dark:hover:bg-gray-800 transition-colors">
         <ArrowLeft class="h-5 w-5" />
       </a>
       <h1 class="font-heading text-3xl font-bold">Secure Checkout</h1>
@@ -161,8 +156,11 @@
                     <Input id="fullName" name="fullName" type="text" placeholder="Recipient's name" required bind:value={fullName} />
                   </div>
                   <div class="space-y-1">
-                    <label for="phone" class="text-xs font-bold uppercase tracking-wider text-[var(--text-secondary)]">Phone Number</label>
-                    <Input id="phone" name="phone" type="tel" placeholder="+880 1XXX-XXXXXX" required bind:value={phone} />
+                    <label for="phone" class="text-xs font-bold uppercase tracking-wider text-[var(--text-secondary)]">Phone Number <span class="text-red-500">*</span></label>
+                    <Input id="phone" name="phone" type="tel" placeholder="01XXXXXXXXX" required bind:value={phone} />
+                    {#if phone && !/^01\d{9}$/.test(phone)}
+                      <p class="text-[10px] text-red-500 font-semibold">Must be 11 digits, starting with 01.</p>
+                    {/if}
                   </div>
                 </div>
 

@@ -134,7 +134,7 @@
 </script>
 
 <svelte:head>
-  <title>{shopTitle} — PerfumeDecantsBD</title>
+  <title>{shopTitle}</title>
 </svelte:head>
 
 <div class="bg-[var(--bg-primary)] py-8 lg:py-12">
@@ -372,12 +372,6 @@
                     <h3 class="mt-1 font-heading text-base font-bold group-hover:text-burgundy-700 dark:group-hover:text-gold-400 transition-colors">
                       {product.name}
                     </h3>
-                    <div class="mt-1 flex items-center gap-1">
-                      {#each Array(5) as _, i}
-                        <Star class="h-3 w-3 {i < Math.floor(product.rating) ? 'fill-gold-400 text-gold-400' : 'text-gray-300'}" />
-                      {/each}
-                      <span class="ml-1 text-xs text-[var(--text-muted)]">({product.review_count})</span>
-                    </div>
                   </div>
                 </div>
 
@@ -491,11 +485,11 @@
     <!-- Content Panel -->
     <div class="absolute right-0 top-0 h-full w-80 max-w-[85vw] bg-white p-6 shadow-2xl dark:bg-gray-950 flex flex-col justify-between overflow-y-auto">
       <div class="space-y-6">
-        <div class="flex items-center justify-between border-b pb-4">
+        <div class="flex items-center justify-between border-b border-gray-200 dark:border-gray-800 pb-4">
           <h2 class="font-heading text-lg font-bold">Filters</h2>
           <button
             onclick={() => (showMobileFilters = false)}
-            class="flex h-8 w-8 items-center justify-center rounded-full hover:bg-gray-100"
+            class="flex h-8 w-8 items-center justify-center rounded-full hover:bg-gray-100 dark:hover:bg-gray-800"
             aria-label="Close filters"
           >
             <X class="h-4 w-4" />
@@ -508,14 +502,14 @@
           <div class="mt-3 space-y-2">
             <button
               onclick={() => { updateFilters({ category: null }); showMobileFilters = false; }}
-              class="block w-full text-left text-sm transition-colors hover:text-burgundy-700 {!filters.category ? 'font-bold text-burgundy-800' : 'text-gray-600'}"
+              class="block w-full text-left text-sm transition-colors hover:text-burgundy-700 {!filters.category ? 'font-bold text-burgundy-800 dark:text-gold-400' : 'text-gray-600 dark:text-gray-400'}"
             >
               All Categories
             </button>
             {#each categories as cat}
               <button
                 onclick={() => { updateFilters({ category: cat.slug }); showMobileFilters = false; }}
-                class="block w-full text-left text-sm transition-colors hover:text-burgundy-700 {filters.category === cat.slug ? 'font-bold text-burgundy-800' : 'text-gray-600'}"
+                class="block w-full text-left text-sm transition-colors hover:text-burgundy-700 {filters.category === cat.slug ? 'font-bold text-burgundy-800 dark:text-gold-400' : 'text-gray-600 dark:text-gray-400'}"
               >
                 {cat.name}
               </button>
@@ -535,7 +529,7 @@
             ] as g}
               <button
                 onclick={() => { updateFilters({ gender: g.val }); showMobileFilters = false; }}
-                class="block w-full text-left text-sm transition-colors hover:text-burgundy-700 {filters.gender === g.val ? 'font-bold text-burgundy-800' : 'text-gray-600'}"
+                class="block w-full text-left text-sm transition-colors hover:text-burgundy-700 {filters.gender === g.val ? 'font-bold text-burgundy-800 dark:text-gold-400' : 'text-gray-600 dark:text-gray-400'}"
               >
                 {g.label}
               </button>
@@ -549,14 +543,14 @@
           <div class="mt-3 space-y-2">
             <button
               onclick={() => { updateFilters({ brand: null }); showMobileFilters = false; }}
-              class="block w-full text-left text-sm transition-colors hover:text-burgundy-700 {!filters.brand ? 'font-bold text-burgundy-800' : 'text-gray-600'}"
+              class="block w-full text-left text-sm transition-colors hover:text-burgundy-700 {!filters.brand ? 'font-bold text-burgundy-800 dark:text-gold-400' : 'text-gray-600 dark:text-gray-400'}"
             >
               All Brands
             </button>
             {#each brands as b}
               <button
                 onclick={() => { updateFilters({ brand: b }); showMobileFilters = false; }}
-                class="block w-full text-left text-sm transition-colors hover:text-burgundy-700 {filters.brand === b ? 'font-bold text-burgundy-800' : 'text-gray-600'}"
+                class="block w-full text-left text-sm transition-colors hover:text-burgundy-700 {filters.brand === b ? 'font-bold text-burgundy-800 dark:text-gold-400' : 'text-gray-600 dark:text-gray-400'}"
               >
                 {b}
               </button>
@@ -579,7 +573,7 @@
         </div>
       </div>
 
-      <div class="border-t pt-4 mt-6">
+      <div class="border-t border-gray-200 dark:border-gray-800 pt-4 mt-6">
         <Button class="w-full bg-burgundy-700 hover:bg-burgundy-800" onclick={() => (showMobileFilters = false)}>
           Apply Filters
         </Button>

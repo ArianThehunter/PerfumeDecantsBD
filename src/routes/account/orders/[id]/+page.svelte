@@ -16,7 +16,7 @@
 </script>
 
 <svelte:head>
-  <title>Order Detail {order.order_number} — PerfumeDecantsBD</title>
+  <title>Order Detail {order.order_number}</title>
 </svelte:head>
 
 <div class="space-y-6">

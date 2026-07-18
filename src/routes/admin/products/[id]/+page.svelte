@@ -51,7 +51,7 @@
 </script>
 
 <svelte:head>
-  <title>Edit Product — PerfumeDecantsBD</title>
+  <title>Edit Product</title>
 </svelte:head>
 
 <div class="space-y-6">

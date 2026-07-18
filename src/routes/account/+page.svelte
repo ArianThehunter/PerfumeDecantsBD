@@ -11,6 +11,20 @@
   let profile = $derived(data.profile);
   let loading = $state(false);
 
+  let phoneValue = $state(profile?.phone || '');
+  let fullNameValue = $state(profile?.full_name || '');
+
+  // Phone validation
+  let phoneValid = $derived(/^01\d{9}$/.test(phoneValue));
+  let phoneTouched = $state(false);
+  let phoneError = $derived.by(() => {
+    if (!phoneTouched || phoneValue === '') return '';
+    if (!/^\d+$/.test(phoneValue)) return 'Only numbers are allowed.';
+    if (!phoneValue.startsWith('01')) return 'Must start with 01.';
+    if (phoneValue.length !== 11) return 'Must be exactly 11 digits.';
+    return '';
+  });
+
   $effect(() => {
     if (form?.success) {
       toast.success('Profile updated successfully');
@@ -19,6 +33,10 @@
     }
   });
 </script>
+
+<svelte:head>
+  <title>Customer Dashboard</title>
+</svelte:head>
 
 <div class="space-y-6">
   <div>
@@ -59,25 +77,36 @@
         name="fullName"
         type="text"
         required
-        value={profile?.full_name || ''}
+        bind:value={fullNameValue}
         placeholder="Enter your full name"
       />
     </div>
 
     <div class="space-y-1">
-      <label for="phone" class="text-xs font-bold uppercase tracking-wider text-[var(--text-secondary)]">Phone Number</label>
+      <label for="phone" class="text-xs font-bold uppercase tracking-wider text-[var(--text-secondary)]">
+        Phone Number <span class="text-red-500">*</span>
+      </label>
       <Input
         id="phone"
         name="phone"
         type="tel"
-        value={profile?.phone || ''}
-        placeholder="+880 1XXX-XXXXXX"
+        required
+        bind:value={phoneValue}
+        oninput={() => { phoneTouched = true; }}
+        placeholder="01XXXXXXXXX"
       />
+      {#if phoneError}
+        <p class="text-[10px] text-red-500 font-semibold mt-0.5">{phoneError}</p>
+      {:else if phoneTouched && phoneValid}
+        <p class="text-[10px] text-green-600 dark:text-green-400 font-semibold mt-0.5">✓ Valid phone number</p>
+      {:else}
+        <p class="text-[10px] text-[var(--text-muted)] mt-0.5">Must be 11 digits, starting with 01.</p>
+      {/if}
     </div>
 
     <Button
       type="submit"
-      disabled={loading}
+      disabled={loading || !phoneValid || !fullNameValue.trim()}
       class="bg-burgundy-700 hover:bg-burgundy-800 text-white font-semibold rounded-xl px-6 py-2.5"
     >
       {loading ? 'Saving Changes...' : 'Save Profile'}

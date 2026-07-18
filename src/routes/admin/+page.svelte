@@ -18,7 +18,7 @@
 </script>
 
 <svelte:head>
-  <title>Admin Dashboard — PerfumeDecantsBD</title>
+  <title>Admin Dashboard</title>
 </svelte:head>
 
 <div class="space-y-8">

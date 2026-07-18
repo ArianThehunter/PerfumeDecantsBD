@@ -29,7 +29,7 @@
 </script>
 
 <svelte:head>
-  <title>Manage Site Settings — PerfumeDecantsBD</title>
+  <title>Site Settings</title>
 </svelte:head>
 
 <div class="space-y-6">

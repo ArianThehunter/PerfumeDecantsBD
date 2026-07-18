@@ -24,7 +24,7 @@
 </script>
 
 <svelte:head>
-  <title>Register — PerfumeDecantsBD</title>
+  <title>Register</title>
 </svelte:head>
 
 <div class="flex min-h-[80vh] items-center justify-center bg-[var(--bg-secondary)] px-4 py-12">

@@ -126,9 +126,9 @@
         {copyright}
       </p>
       <div class="flex gap-6">
-        <a href="/about" class="text-xs text-cream-300/40 transition-colors hover:text-gold-400">Privacy Policy</a>
-        <a href="/contact" class="text-xs text-cream-300/40 transition-colors hover:text-gold-400">Terms of Service</a>
-        <a href="/contact" class="text-xs text-cream-300/40 transition-colors hover:text-gold-400">Refund Policy</a>
+        <a href="/privacy-policy" class="text-xs text-cream-300/40 transition-colors hover:text-gold-400">Privacy Policy</a>
+        <a href="/terms" class="text-xs text-cream-300/40 transition-colors hover:text-gold-400">Terms & Conditions</a>
+        <a href="/refund-policy" class="text-xs text-cream-300/40 transition-colors hover:text-gold-400">Refund Policy</a>
       </div>
     </div>
   </div>

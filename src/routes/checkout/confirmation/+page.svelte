@@ -14,7 +14,7 @@
 </script>
 
 <svelte:head>
-  <title>Order Confirmed — PerfumeDecantsBD</title>
+  <title>Order Confirmed</title>
 </svelte:head>
 
 <div class="flex min-h-[80vh] items-center justify-center bg-[var(--bg-secondary)] px-4 py-12">
@@ -22,7 +22,7 @@
     <div class="space-y-4">
       <CheckCircle class="mx-auto h-16 w-16 text-green-500 animate-scale-in" />
       <h1 class="font-heading text-3xl font-bold tracking-tight text-burgundy-950 dark:text-cream-200">
-        Thank You for Your Order!
+        Thank you for your order!
       </h1>
       <p class="text-sm text-[var(--text-secondary)] leading-relaxed max-w-md mx-auto">
         Your order has been placed successfully. A confirmation email/message will be sent shortly containing packaging details.
@@ -59,13 +59,23 @@
     </div>
 
     <div class="flex flex-col sm:flex-row gap-3 justify-center pt-4">
-      <a
-        href="/account/orders/{order.id}"
-        class="btn-press flex items-center justify-center gap-2 rounded-xl border border-gray-200 px-6 py-3 text-sm font-semibold transition-colors hover:bg-gray-50 dark:border-gray-800 dark:hover:bg-gray-900"
-      >
-        <ShoppingBag class="h-4 w-4" />
-        Track Order
-      </a>
+      {#if data.isAuthenticated}
+        <a
+          href="/account/orders/{order.id}"
+          class="btn-press flex items-center justify-center gap-2 rounded-xl border border-gray-200 px-6 py-3 text-sm font-semibold transition-colors hover:bg-gray-50 dark:border-gray-800 dark:hover:bg-gray-900"
+        >
+          <ShoppingBag class="h-4 w-4" />
+          Track Order
+        </a>
+      {:else}
+        <a
+          href="/auth/register"
+          class="btn-press flex items-center justify-center gap-2 rounded-xl border border-gray-200 px-6 py-3 text-sm font-semibold transition-colors hover:bg-gray-50 dark:border-gray-800 dark:hover:bg-gray-900"
+        >
+          <ShoppingBag class="h-4 w-4" />
+          Create Account to Track
+        </a>
+      {/if}
       <a
         href="/shop"
         class="btn-press flex items-center justify-center gap-2 rounded-xl bg-burgundy-700 px-6 py-3 text-sm font-semibold text-white transition-colors hover:bg-burgundy-800"

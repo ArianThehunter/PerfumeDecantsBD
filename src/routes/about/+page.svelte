@@ -16,7 +16,7 @@
 </script>
 
 <svelte:head>
-  <title>{title} — About Us | PerfumeDecantsBD</title>
+  <title>About</title>
 </svelte:head>
 
 <div class="bg-[var(--bg-primary)]">

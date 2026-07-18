@@ -105,7 +105,7 @@ html {
 }
 
 body {
-  @apply bg-white text-gray-900 transition-colors duration-300;
+  @apply bg-[var(--bg-primary)] text-gray-900 transition-colors duration-300;
 }
 
 :root {

@@ -9,29 +9,35 @@
   let orders = $derived(data.orders);
   let searchQuery = $state('');
 
-  // Filter orders by search query
+  // Filter orders by search query (order number, name, phone, email, status)
   const filteredOrders = $derived(
     orders.filter((order: any) => {
       const query = searchQuery.toLowerCase();
+      if (!query) return true;
       const orderNum = order.order_number.toLowerCase();
       const customerName = (order.profiles?.full_name || '').toLowerCase();
-      const phone = (order.profiles?.phone || '').toLowerCase();
+      const profilePhone = (order.profiles?.phone || '').toLowerCase();
       const status = order.status.toLowerCase();
-      const addrName = ((order.shipping_address as any)?.full_name || '').toLowerCase();
+      const addr = order.shipping_address as any;
+      const addrName = (addr?.full_name || '').toLowerCase();
+      const addrPhone = (addr?.phone || '').toLowerCase();
+      const addrEmail = (addr?.email || '').toLowerCase();
 
       return (
         orderNum.includes(query) ||
         customerName.includes(query) ||
-        phone.includes(query) ||
+        profilePhone.includes(query) ||
         status.includes(query) ||
-        addrName.includes(query)
+        addrName.includes(query) ||
+        addrPhone.includes(query) ||
+        addrEmail.includes(query)
       );
     })
   );
 </script>
 
 <svelte:head>
-  <title>Manage Orders — PerfumeDecantsBD</title>
+  <title>Manage Orders</title>
 </svelte:head>
 
 <div class="space-y-6">
@@ -44,7 +50,7 @@
     <div class="relative w-full sm:w-80">
       <Input
         type="search"
-        placeholder="Search code, user, phone..."
+        placeholder="Search order, name, phone, email..."
         bind:value={searchQuery}
         class="pl-10 pr-4"
       />

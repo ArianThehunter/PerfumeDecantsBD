@@ -28,6 +28,7 @@ export const load: PageServerLoad = async ({ url, locals }) => {
   }
 
   return {
-    order
+    order,
+    isAuthenticated: !!user
   };
 };

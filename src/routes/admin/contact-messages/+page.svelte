@@ -44,7 +44,7 @@
 </script>
 
 <svelte:head>
-  <title>Contact Messages — PerfumeDecantsBD</title>
+  <title>Contact Messages</title>
 </svelte:head>
 
 <div class="space-y-6">

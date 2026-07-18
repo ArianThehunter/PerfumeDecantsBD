@@ -31,7 +31,7 @@
 </script>
 
 <svelte:head>
-  <title>Admin Dashboard — PerfumeDecantsBD</title>
+  <title>Admin Dashboard</title>
 </svelte:head>
 
 <div class="min-h-screen bg-[var(--bg-secondary)] flex flex-col lg:flex-row">
@@ -103,7 +103,7 @@
   <!-- Main panel -->
   <div class="flex-1 flex flex-col min-w-0">
     <!-- Top Bar -->
-    <header class="h-16 bg-white dark:bg-gray-950 border-b flex items-center justify-between px-6 shrink-0">
+    <header class="h-16 bg-white dark:bg-gray-950 border-b border-gray-200 dark:border-gray-800 flex items-center justify-between px-6 shrink-0">
       <h2 class="font-heading text-lg font-bold">Atelier Dashboard</h2>
       <div class="flex items-center gap-4">
         <span class="text-xs font-semibold bg-gold-100 dark:bg-gold-950 text-gold-800 dark:text-gold-400 rounded-full px-3 py-1 uppercase tracking-wider">

@@ -223,7 +223,7 @@
 </script>
 
 <svelte:head>
-  <title>Frequently Asked Questions — PerfumeDecantsBD</title>
+  <title>FAQ</title>
 </svelte:head>
 
 <div class="bg-[var(--bg-primary)] min-h-screen">

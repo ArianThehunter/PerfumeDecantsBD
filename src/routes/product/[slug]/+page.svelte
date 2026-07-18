@@ -58,7 +58,7 @@
 </script>
 
 <svelte:head>
-  <title>{product.name} — {product.brand} | PerfumeDecantsBD</title>
+  <title>{product.name} — {product.brand}</title>
 </svelte:head>
 
 <div class="bg-[var(--bg-primary)] py-8 lg:py-16">
@@ -111,16 +111,6 @@
           <div>
             <p class="text-sm font-semibold uppercase tracking-wider text-gold-600">{product.brand}</p>
             <h1 class="font-heading mt-2 text-3xl font-bold lg:text-4xl">{product.name}</h1>
-            
-            <div class="mt-3 flex items-center gap-2">
-              <div class="flex gap-0.5">
-                {#each Array(5) as _, i}
-                  <Star class="h-4 w-4 {i < Math.floor(product.rating) ? 'fill-gold-400 text-gold-400' : 'text-gray-300'}" />
-                {/each}
-              </div>
-              <span class="text-sm font-medium">{product.rating}</span>
-              <span class="text-xs text-[var(--text-muted)]">({product.review_count} verified reviews)</span>
-            </div>
           </div>
 
           <!-- Price Display -->
@@ -301,7 +291,7 @@
           <div class="space-y-4 text-sm text-[var(--text-secondary)] leading-relaxed">
             <h3 class="font-heading text-lg font-bold">Delivery inside Bangladesh</h3>
             <p>We deliver nationwide inside Bangladesh. Orders inside Dhaka are delivered in 1-2 days, outside Dhaka in 2-3 business days.</p>
-            <p><strong>Shipping Rates:</strong> Free shipping for orders above ৳5,000. Flat rate ৳120 applies to orders below ৳5,000.</p>
+            <p><strong>Shipping Rates:</strong> Inside Dhaka ৳80 and outside Dhaka ৳140. Free shipping for orders above ৳5,000.</p>
           </div>
         {/if}
       </div>

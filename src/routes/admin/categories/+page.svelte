@@ -47,7 +47,7 @@
 </script>
 
 <svelte:head>
-  <title>Manage Categories — PerfumeDecantsBD</title>
+  <title>Manage Categories</title>
 </svelte:head>
 
 <div class="space-y-6">

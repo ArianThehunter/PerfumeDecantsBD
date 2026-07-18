@@ -45,7 +45,7 @@
 </script>
 
 <svelte:head>
-  <title>New Product — PerfumeDecantsBD</title>
+  <title>New Product</title>
 </svelte:head>
 
 <div class="space-y-6">

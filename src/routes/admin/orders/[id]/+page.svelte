@@ -24,14 +24,14 @@
 </script>
 
 <svelte:head>
-  <title>Fulfill Order {order.order_number} — PerfumeDecantsBD</title>
+  <title>Fulfill Order {order.order_number}</title>
 </svelte:head>
 
 <div class="space-y-6">
   <div class="flex items-center gap-3">
     <a
       href="/admin/orders"
-      class="flex h-8 w-8 items-center justify-center rounded-full hover:bg-gray-100 transition-colors"
+      class="flex h-8 w-8 items-center justify-center rounded-full hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors"
       aria-label="Back to order history"
     >
       <ArrowLeft class="h-4 w-4" />
@@ -102,12 +102,16 @@
       <div class="space-y-1.5 text-xs">
         <p class="font-bold text-gray-900 dark:text-white">{addr?.full_name || 'Guest'}</p>
         <p class="flex items-center gap-1.5 text-[var(--text-secondary)]">
-          <Mail class="h-3.5 w-3.5 text-gray-400" />
-          {addr?.email || 'N/A'}
+          <Phone class="h-3.5 w-3.5 text-gray-400" />
+          {#if addr?.phone}
+            <a href="tel:{addr.phone}" class="font-semibold text-burgundy-700 dark:text-gold-400 hover:underline">{addr.phone}</a>
+          {:else}
+            N/A
+          {/if}
         </p>
         <p class="flex items-center gap-1.5 text-[var(--text-secondary)]">
-          <Phone class="h-3.5 w-3.5 text-gray-400" />
-          {addr?.phone || 'N/A'}
+          <Mail class="h-3.5 w-3.5 text-gray-400" />
+          {addr?.email || 'N/A'}
         </p>
       </div>
     </div>
@@ -123,7 +127,7 @@
         {#if addr?.address_line_2}
           , {addr.address_line_2}
         {/if}
-        <br />{addr?.city} - {addr?.postal_code}
+        <br />{addr?.city}{#if addr?.district} - {addr.district}{/if}{#if addr?.postal_code} - {addr.postal_code}{/if}
       </p>
     </div>
   </div>

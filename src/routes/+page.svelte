@@ -112,7 +112,7 @@
 </script>
 
 <svelte:head>
-  <title>PerfumeDecantsBD — Premium Luxury Perfume Decants</title>
+  <title>PerfumeDecantsBD</title>
 </svelte:head>
 
 <!-- Hero Section -->
@@ -214,7 +214,7 @@
             <p class="mt-1 text-xs text-cream-300/50 sm:text-sm">Happy Customers</p>
           </div>
           <div>
-            <p class="font-heading text-2xl font-bold text-gold-400 sm:text-3xl">50+</p>
+            <p class="font-heading text-2xl font-bold text-gold-400 sm:text-3xl">20+</p>
             <p class="mt-1 text-xs text-cream-300/50 sm:text-sm">Premium Brands</p>
           </div>
           <div>
@@ -266,12 +266,6 @@
           <div class="p-4">
             <p class="text-xs font-medium uppercase tracking-wider text-[var(--text-muted)]">{product.brand}</p>
             <h3 class="mt-1 font-heading text-lg font-semibold group-hover:text-burgundy-700 dark:group-hover:text-gold-400 transition-colors">{product.name}</h3>
-            <div class="mt-1 flex items-center gap-1">
-              {#each Array(5) as _, i}
-                <Star class="h-3 w-3 {i < Math.floor(product.rating) ? 'fill-gold-400 text-gold-400' : 'text-gray-300'}" />
-              {/each}
-              <span class="ml-1 text-xs text-[var(--text-muted)]">{product.rating}</span>
-            </div>
             <div class="mt-2 flex items-center justify-between">
               <div>
                 {#if product.discount_price}
@@ -390,12 +384,6 @@
           <div class="p-4">
             <p class="text-xs font-medium uppercase tracking-wider text-[var(--text-muted)]">{product.brand}</p>
             <h3 class="mt-1 font-heading text-lg font-semibold group-hover:text-burgundy-700 dark:group-hover:text-gold-400 transition-colors">{product.name}</h3>
-            <div class="mt-1 flex items-center gap-1">
-              {#each Array(5) as _, i}
-                <Star class="h-3 w-3 {i < Math.floor(product.rating) ? 'fill-gold-400 text-gold-400' : 'text-gray-300'}" />
-              {/each}
-              <span class="ml-1 text-xs text-[var(--text-muted)]">{product.rating}</span>
-            </div>
             <div class="mt-2 flex items-center justify-between">
               <div>
                 <span class="font-heading text-lg font-bold text-burgundy-700 dark:text-gold-400 block">{formatPrice(product.price)}</span>

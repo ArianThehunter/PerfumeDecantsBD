@@ -7,7 +7,7 @@
 </script>
 
 <svelte:head>
-  <title>Shopping Cart — PerfumeDecantsBD</title>
+  <title>Shopping Cart</title>
 </svelte:head>
 
 <div class="bg-[var(--bg-secondary)] py-10 lg:py-16 min-h-[80vh]">

@@ -4,9 +4,12 @@
   import type { PageData } from './$types';
 
   let { data } = $props<{ data: PageData }>();
-
   let orders = $derived(data.orders);
 </script>
+
+<svelte:head>
+  <title>Order History</title>
+</svelte:head>
 
 <div class="space-y-6">
   <div>

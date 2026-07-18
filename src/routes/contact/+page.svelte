@@ -40,7 +40,7 @@
 </script>
 
 <svelte:head>
-  <title>{title} — PerfumeDecantsBD</title>
+  <title>Contact</title>
 </svelte:head>
 
 <div class="bg-[var(--bg-primary)]">
