@@ -52,7 +52,10 @@ export const actions: Actions = {
       })
       .eq('key', 'footer');
 
-    if (error) return fail(500, { message: error.message });
+    if (error) {
+      console.error('Failed to update footer settings:', error);
+      return fail(500, { message: 'An internal error occurred while saving footer settings.' });
+    }
     return { success: true };
   },
 
@@ -79,7 +82,10 @@ export const actions: Actions = {
       })
       .eq('key', 'about_page');
 
-    if (error) return fail(500, { message: error.message });
+    if (error) {
+      console.error('Failed to update about settings:', error);
+      return fail(500, { message: 'An internal error occurred while saving about page settings.' });
+    }
     return { success: true };
   },
 
@@ -106,7 +112,10 @@ export const actions: Actions = {
       })
       .eq('key', 'contact_page');
 
-    if (error) return fail(500, { message: error.message });
+    if (error) {
+      console.error('Failed to update contact settings:', error);
+      return fail(500, { message: 'An internal error occurred while saving contact page settings.' });
+    }
     return { success: true };
   },
 
@@ -127,7 +136,10 @@ export const actions: Actions = {
       })
       .eq('key', 'shop_page');
 
-    if (error) return fail(500, { message: error.message });
+    if (error) {
+      console.error('Failed to update shop settings:', error);
+      return fail(500, { message: 'An internal error occurred while saving shop page settings.' });
+    }
     return { success: true };
   },
 
@@ -157,7 +169,10 @@ export const actions: Actions = {
         updated_at: new Date().toISOString()
       }, { onConflict: 'key' });
 
-    if (error) return fail(500, { message: error.message });
+    if (error) {
+      console.error('Failed to update hero settings:', error);
+      return fail(500, { message: 'An internal error occurred while saving hero slides settings.' });
+    }
     return { success: true };
   }
 };

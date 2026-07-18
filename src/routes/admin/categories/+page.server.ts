@@ -40,7 +40,8 @@ export const actions: Actions = {
       });
 
     if (error) {
-      return fail(500, { message: error.message });
+      console.error('Failed to create category:', error);
+      return fail(500, { message: 'An internal error occurred. Could not create category.' });
     }
 
     return { success: true };
@@ -74,7 +75,8 @@ export const actions: Actions = {
       .eq('id', id);
 
     if (error) {
-      return fail(500, { message: error.message });
+      console.error('Failed to update category:', error);
+      return fail(500, { message: 'An internal error occurred. Could not update category.' });
     }
 
     return { success: true };
@@ -91,7 +93,8 @@ export const actions: Actions = {
       .eq('id', id);
 
     if (error) {
-      return fail(500, { message: error.message });
+      console.error('Failed to delete category:', error);
+      return fail(500, { message: 'An internal error occurred. Could not delete category.' });
     }
 
     return { success: true };

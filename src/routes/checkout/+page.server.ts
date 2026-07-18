@@ -33,7 +33,7 @@ export const load: PageServerLoad = async ({ locals }) => {
 };
 
 export const actions: Actions = {
-  placeOrder: async ({ request, locals }) => {
+  placeOrder: async ({ request, locals, cookies }) => {
     const supabase = locals.supabase as any;
     const user = locals.user;
 
@@ -176,7 +176,8 @@ export const actions: Actions = {
       .single();
 
     if (orderErr || !order) {
-      return fail(500, { message: orderErr?.message || 'Failed to place order' });
+      console.error('Failed to place order:', orderErr);
+      return fail(500, { message: 'An internal database error occurred. Failed to place order. Please try again.' });
     }
 
     // Insert Order Items and update stocks
@@ -208,6 +209,14 @@ export const actions: Actions = {
           .eq('id', item.product_id);
       }
     }
+
+    cookies.set('placed_order_id', order.id, {
+      path: '/',
+      httpOnly: true,
+      secure: true,
+      sameSite: 'strict',
+      maxAge: 60 * 15 // 15 minutes
+    });
 
     throw redirect(303, `/checkout/confirmation?id=${order.id}`);
   }

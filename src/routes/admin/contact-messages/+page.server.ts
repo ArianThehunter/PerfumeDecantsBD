@@ -17,9 +17,10 @@ export const load: PageServerLoad = async ({ url, locals }) => {
   const { data: messages, error } = await query;
 
   if (error) {
+    console.error('Failed to load contact messages:', error);
     return {
       messages: [],
-      error: error.message
+      error: 'An internal error occurred while loading contact messages.'
     };
   }
 
@@ -42,7 +43,10 @@ export const actions: Actions = {
       .update({ is_read: true })
       .eq('id', id);
 
-    if (error) return fail(500, { message: error.message });
+    if (error) {
+      console.error('Failed to mark message as read:', error);
+      return fail(500, { message: 'An internal error occurred while updating the message.' });
+    }
     return { success: true };
   },
 
@@ -58,7 +62,10 @@ export const actions: Actions = {
       .update({ is_read: false })
       .eq('id', id);
 
-    if (error) return fail(500, { message: error.message });
+    if (error) {
+      console.error('Failed to mark message as unread:', error);
+      return fail(500, { message: 'An internal error occurred while updating the message.' });
+    }
     return { success: true };
   },
 
@@ -74,7 +81,10 @@ export const actions: Actions = {
       .delete()
       .eq('id', id);
 
-    if (error) return fail(500, { message: error.message });
+    if (error) {
+      console.error('Failed to delete message:', error);
+      return fail(500, { message: 'An internal error occurred while deleting the message.' });
+    }
     return { success: true };
   }
 };

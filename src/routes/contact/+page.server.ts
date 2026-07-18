@@ -34,7 +34,8 @@ export const actions: Actions = {
       });
 
     if (error) {
-      return fail(500, { message: error.message || 'Failed to submit your message' });
+      console.error('Failed to submit contact message:', error);
+      return fail(500, { message: 'An internal error occurred. Could not submit your message at this time.' });
     }
 
     return { success: true };

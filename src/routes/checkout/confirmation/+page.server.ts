@@ -1,7 +1,7 @@
 import { error } from '@sveltejs/kit';
 import type { PageServerLoad } from './$types';
 
-export const load: PageServerLoad = async ({ url, locals }) => {
+export const load: PageServerLoad = async ({ url, locals, cookies }) => {
   const supabase = locals.supabase as any;
   const user = locals.user;
 
@@ -23,6 +23,12 @@ export const load: PageServerLoad = async ({ url, locals }) => {
   // If order belongs to a user, make sure that user matches
   if (order.user_id) {
     if (!user || order.user_id !== user.id) {
+      throw error(403, 'Forbidden');
+    }
+  } else {
+    // If guest checkout, verify using the temporary session cookie
+    const placedOrderId = cookies.get('placed_order_id');
+    if (placedOrderId !== order.id) {
       throw error(403, 'Forbidden');
     }
   }

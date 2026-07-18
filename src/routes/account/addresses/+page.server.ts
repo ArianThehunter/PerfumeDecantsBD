@@ -62,7 +62,8 @@ export const actions: Actions = {
       });
 
     if (error) {
-      return fail(500, { message: error.message });
+      console.error('Failed to add address:', error);
+      return fail(500, { message: 'An internal database error occurred while saving the address.' });
     }
 
     return { success: true };
@@ -84,7 +85,8 @@ export const actions: Actions = {
       .eq('user_id', user.id);
 
     if (error) {
-      return fail(500, { message: error.message });
+      console.error('Failed to delete address:', error);
+      return fail(500, { message: 'An internal database error occurred while deleting the address.' });
     }
 
     return { success: true };
@@ -113,7 +115,8 @@ export const actions: Actions = {
       .eq('user_id', user.id);
 
     if (error) {
-      return fail(500, { message: error.message });
+      console.error('Failed to set default address:', error);
+      return fail(500, { message: 'An internal database error occurred while updating the address.' });
     }
 
     return { success: true };

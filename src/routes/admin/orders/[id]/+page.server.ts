@@ -46,7 +46,8 @@ export const actions: Actions = {
       .eq('id', params.id);
 
     if (error) {
-      return fail(500, { message: error.message });
+      console.error('Failed to update order status:', error);
+      return fail(500, { message: 'An internal error occurred while updating the status. Please try again.' });
     }
 
     return { success: true };

@@ -105,14 +105,28 @@ export const actions: Actions = {
       .eq('id', params.id);
 
     if (prodError) {
-      return fail(500, { message: prodError.message });
+      console.error('Failed to update product details:', prodError);
+      return fail(500, { message: 'An internal database error occurred while updating the product. Please try again.' });
     }
 
     let finalImageUrl = imageUrl || '';
 
     // Handle local image file upload if provided
     if (imageFile && imageFile.size > 0) {
-      const fileExt = imageFile.name.split('.').pop();
+      // 5MB limit
+      if (imageFile.size > 5 * 1024 * 1024) {
+        return fail(400, { message: 'Image file size must be under 5MB.' });
+      }
+
+      // Safe extensions and MIME types
+      const fileExt = imageFile.name.split('.').pop()?.toLowerCase();
+      const allowedExts = ['jpg', 'jpeg', 'png', 'webp', 'gif'];
+      const allowedMimes = ['image/jpeg', 'image/png', 'image/webp', 'image/gif'];
+
+      if (!fileExt || !allowedExts.includes(fileExt) || !allowedMimes.includes(imageFile.type)) {
+        return fail(400, { message: 'Only image files (JPG, PNG, WEBP, GIF) are allowed.' });
+      }
+
       const fileName = `${params.id}/${Date.now()}.${fileExt}`;
       const { data: uploadData, error: uploadError } = await supabase.storage
         .from('products')

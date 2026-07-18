@@ -53,7 +53,8 @@ export const actions: Actions = {
       .eq('id', user.id);
 
     if (error) {
-      return fail(500, { message: error.message });
+      console.error('Failed to update profile details:', error);
+      return fail(500, { message: 'An internal error occurred while updating your profile. Please try again.' });
     }
 
     return { success: true };
@@ -71,7 +72,8 @@ export const actions: Actions = {
     });
 
     if (error) {
-      return fail(500, { message: error.message || 'Failed to claim orders.' });
+      console.error('Failed to claim guest orders:', error);
+      return fail(500, { message: 'An internal error occurred while associating your previous orders.' });
     }
 
     return { success: true, claimedCount };

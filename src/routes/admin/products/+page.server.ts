@@ -30,7 +30,8 @@ export const actions: Actions = {
       .eq('id', id);
 
     if (error) {
-      return fail(500, { message: error.message });
+      console.error('Failed to delete product:', error);
+      return fail(500, { message: 'An internal database error occurred. Could not delete product.' });
     }
 
     return { success: true };
