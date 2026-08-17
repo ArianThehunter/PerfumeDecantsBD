@@ -139,26 +139,62 @@ export const actions: Actions = {
       };
     }
 
-    // Calculate subtotal and shipping
-    let subtotal = 0;
-    for (const item of cartItems) {
-      subtotal += item.unit_price * item.quantity;
-    }
-    const shippingCost = (finalDistrict === 'Dhaka' && finalCity.trim().toLowerCase() === 'dhaka') ? 80 : 140;
-    const total = subtotal + shippingCost;
+    // Validate stock and compute authoritative prices from DB
+    let verifiedSubtotal = 0;
+    const verifiedOrderItems: Array<{
+      product_id: string;
+      product_name: string;
+      product_image: string | null;
+      size: string | null;
+      quantity: number;
+      unit_price: number;
+      total_price: number;
+    }> = [];
 
-    // Validate and decrement stock
     for (const item of cartItems) {
+      if (!item.product_id || !item.quantity || item.quantity <= 0) {
+        return fail(400, { message: 'Invalid item in cart' });
+      }
+
       const { data: prod } = await supabase
         .from('products')
-        .select('stock_quantity, name')
+        .select('id, name, price, discount_price, sizes, stock_quantity, status')
         .eq('id', item.product_id)
         .single();
 
-      if (!prod || prod.stock_quantity < item.quantity) {
-        return fail(400, { message: `Insufficient stock for product: ${prod?.name || 'Unknown'}` });
+      if (!prod || prod.status !== 'active') {
+        return fail(400, { message: `Product is unavailable: ${item.product_name || 'Item'}` });
       }
+
+      if (prod.stock_quantity < item.quantity) {
+        return fail(400, { message: `Insufficient stock for product: ${prod.name}. Available: ${prod.stock_quantity}` });
+      }
+
+      // Compute authoritative price
+      let authoritativeUnitPrice = Number(prod.discount_price ?? prod.price);
+      if (item.size && Array.isArray(prod.sizes) && prod.sizes.length > 0) {
+        const matchingSize = prod.sizes.find((s: any) => s.label === item.size || s.ml?.toString() === item.size);
+        if (matchingSize && typeof matchingSize.price === 'number') {
+          authoritativeUnitPrice = matchingSize.price;
+        }
+      }
+
+      const itemTotal = authoritativeUnitPrice * item.quantity;
+      verifiedSubtotal += itemTotal;
+
+      verifiedOrderItems.push({
+        product_id: prod.id,
+        product_name: prod.name,
+        product_image: item.product_image || null,
+        size: item.size || null,
+        quantity: item.quantity,
+        unit_price: authoritativeUnitPrice,
+        total_price: itemTotal
+      });
     }
+
+    const shippingCost = (finalDistrict === 'Dhaka' && finalCity.trim().toLowerCase() === 'dhaka') ? 80 : 140;
+    const total = verifiedSubtotal + shippingCost;
 
     // Insert Order
     const { data: order, error: orderErr } = await supabase
@@ -166,7 +202,7 @@ export const actions: Actions = {
       .insert({
         user_id: user?.id || null,
         status: 'pending',
-        subtotal,
+        subtotal: verifiedSubtotal,
         shipping_cost: shippingCost,
         total,
         payment_method: paymentMethod as any,
@@ -181,9 +217,8 @@ export const actions: Actions = {
       return fail(500, { message: 'An internal database error occurred. Failed to place order. Please try again.' });
     }
 
-    // Insert Order Items and update stocks
-    for (const item of cartItems) {
-      // Insert item
+    // Insert Order Items
+    for (const item of verifiedOrderItems) {
       await supabase.from('order_items').insert({
         order_id: order.id,
         product_id: item.product_id,
@@ -192,9 +227,8 @@ export const actions: Actions = {
         size: item.size,
         quantity: item.quantity,
         unit_price: item.unit_price,
-        total_price: item.unit_price * item.quantity
+        total_price: item.total_price
       });
-
     }
 
     // Log order placement success

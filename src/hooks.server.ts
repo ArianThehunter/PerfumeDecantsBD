@@ -1,7 +1,8 @@
 import { createServerClient } from '@supabase/ssr';
-import { type Handle, redirect } from '@sveltejs/kit';
+import { type Handle, type HandleServerError, redirect } from '@sveltejs/kit';
 import { PUBLIC_SUPABASE_URL, PUBLIC_SUPABASE_ANON_KEY } from '$env/static/public';
 import type { Database } from '$lib/types/database';
+import { logger } from '$lib/services/logger';
 
 export const handle: Handle = async ({ event, resolve }) => {
   // Create Supabase client for this request
@@ -34,7 +35,7 @@ export const handle: Handle = async ({ event, resolve }) => {
       return { session: null, user: null };
     }
 
-    // Verify the user with getUser() for security
+    // Verify the user with getUser() for security against forged sessions
     const {
       data: { user },
       error
@@ -96,9 +97,37 @@ export const handle: Handle = async ({ event, resolve }) => {
     }
   }
 
-  return resolve(event, {
+  const response = await resolve(event, {
     filterSerializedResponseHeaders(name) {
       return name === 'content-range' || name === 'x-supabase-api-version';
     }
   });
+
+  // Apply enterprise-grade security headers to all HTTP responses
+  response.headers.set('X-Content-Type-Options', 'nosniff');
+  response.headers.set('X-Frame-Options', 'DENY');
+  response.headers.set('Referrer-Policy', 'strict-origin-when-cross-origin');
+  response.headers.set('Permissions-Policy', 'camera=(), microphone=(), geolocation=()');
+  response.headers.set('Strict-Transport-Security', 'max-age=31536000; includeSubDomains; preload');
+
+  return response;
+};
+
+// Global server error handling and structured audit logging
+export const handleError: HandleServerError = async ({ error, event, status, message }) => {
+  const errorId = crypto.randomUUID();
+  const userId = event.locals?.user?.id || null;
+  const userEmail = event.locals?.user?.email || null;
+
+  logger.error('Unhandled server error', error, {
+    errorId,
+    status,
+    url: event.url.toString(),
+    method: event.request.method
+  }, userId, userEmail);
+
+  return {
+    message: status === 404 ? 'Page not found' : 'An internal server error occurred',
+    errorId
+  };
 };

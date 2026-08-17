@@ -88,6 +88,7 @@
   <div 
     bind:this={sliderRef}
     class="relative h-2 w-full rounded-full bg-gray-200 dark:bg-gray-800 cursor-pointer select-none"
+    role="presentation"
     onclick={handleTrackClick}
   >
     <!-- Highlighted Track -->

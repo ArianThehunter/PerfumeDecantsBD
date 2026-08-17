@@ -11,8 +11,16 @@
   let profile = $derived(data.profile);
   let loading = $state(false);
 
-  let phoneValue = $state(profile?.phone || '');
-  let fullNameValue = $state(profile?.full_name || '');
+  let phoneValue = $state('');
+  let fullNameValue = $state('');
+
+  // Sync state reactively with profile prop
+  $effect(() => {
+    if (profile) {
+      phoneValue = profile.phone || '';
+      fullNameValue = profile.full_name || '';
+    }
+  });
 
   // Phone validation
   let phoneValid = $derived(/^01\d{9}$/.test(phoneValue));
