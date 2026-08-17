@@ -1,7 +1,12 @@
 import type { PageServerLoad } from './$types';
 
-export const load: PageServerLoad = async ({ url, locals }) => {
+export const load: PageServerLoad = async ({ url, locals, setHeaders }) => {
   const supabase = locals.supabase;
+
+  // Set Edge CDN caching headers for catalog browsing
+  setHeaders({
+    'cache-control': 'public, max-age=60, s-maxage=180, stale-while-revalidate=300'
+  });
 
   // Read query params
   const search = url.searchParams.get('search') || '';
@@ -14,21 +19,22 @@ export const load: PageServerLoad = async ({ url, locals }) => {
   const page = Number(url.searchParams.get('page')) || 1;
   const perPage = 12;
 
-  // 1. Fetch Categories for filters
-  const { data: categories } = await supabase
-    .from('categories')
-    .select('id, name, slug')
-    .order('display_order', { ascending: true });
+  // Execute filter metadata fetches concurrently
+  const [categoriesRes, brandsRes] = await Promise.all([
+    supabase
+      .from('categories')
+      .select('id, name, slug')
+      .order('display_order', { ascending: true }),
+    supabase
+      .from('products')
+      .select('brand')
+      .eq('status', 'active')
+  ]);
 
-  // 2. Fetch distinct brands for filter checklist
-  // (Using a simple query since PG doesn't have native "DISTINCT ON" direct endpoint in Supabase easily without RPC, but we can do simple select)
-  const { data: allProductsForBrands } = await supabase
-    .from('products')
-    .select('brand')
-    .eq('status', 'active');
-  const brands = Array.from(new Set(allProductsForBrands?.map((p: any) => p.brand) || []));
+  const categories = categoriesRes.data || [];
+  const brands = Array.from(new Set(brandsRes.data?.map((p: any) => p.brand) || []));
 
-  // 3. Build main query
+  // Build main product query
   let query = supabase
     .from('products')
     .select('*, product_images(*)', { count: 'exact' })
@@ -39,15 +45,19 @@ export const load: PageServerLoad = async ({ url, locals }) => {
   }
 
   if (categorySlug) {
-    // Resolve category first
-    const { data: cat } = await supabase
-      .from('categories')
-      .select('id')
-      .eq('slug', categorySlug)
-      .single();
+    const selectedCategory = categories.find((c: any) => c.slug === categorySlug);
+    if (selectedCategory) {
+      query = query.eq('category_id', selectedCategory.id);
+    } else {
+      const { data: cat } = await supabase
+        .from('categories')
+        .select('id')
+        .eq('slug', categorySlug)
+        .single();
 
-    if (cat) {
-      query = query.eq('category_id', cat.id);
+      if (cat) {
+        query = query.eq('category_id', cat.id);
+      }
     }
   }
 
@@ -70,7 +80,6 @@ export const load: PageServerLoad = async ({ url, locals }) => {
   } else if (sort === 'price_desc') {
     query = query.order('price', { ascending: false });
   } else {
-    // Default: popular / rating
     query = query.order('rating', { ascending: false }).order('review_count', { ascending: false });
   }
 
@@ -79,13 +88,13 @@ export const load: PageServerLoad = async ({ url, locals }) => {
   const to = from + perPage - 1;
   query = query.range(from, to);
 
-  const { data: products, count, error } = await query;
+  const { data: products, count } = await query;
 
   return {
     products: products || [],
     totalCount: count || 0,
-    categories: categories || [],
-    brands: brands || [],
+    categories,
+    brands,
     filters: {
       search,
       category: categorySlug,

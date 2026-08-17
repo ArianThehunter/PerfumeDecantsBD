@@ -1,8 +1,13 @@
 import { error } from '@sveltejs/kit';
 import type { PageServerLoad } from './$types';
 
-export const load: PageServerLoad = async ({ params, locals }) => {
+export const load: PageServerLoad = async ({ params, locals, setHeaders }) => {
   const supabase = locals.supabase;
+
+  // Set Edge CDN caching headers for product detail pages
+  setHeaders({
+    'cache-control': 'public, max-age=60, s-maxage=300, stale-while-revalidate=600'
+  });
 
   // Fetch product detail with images and category
   const { data: product, error: err } = await supabase

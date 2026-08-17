@@ -1,7 +1,8 @@
 import type { LayoutServerLoad } from './$types';
 
 export const load: LayoutServerLoad = async ({ locals }) => {
-  const { session, user } = await locals.safeGetSession();
+  const session = locals.session;
+  const user = locals.user;
   const supabase = locals.supabase;
 
   // Load general settings
